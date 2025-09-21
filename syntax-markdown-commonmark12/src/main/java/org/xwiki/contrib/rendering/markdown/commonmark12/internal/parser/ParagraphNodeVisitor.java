@@ -28,8 +28,12 @@ import java.util.Set;
 
 import org.xwiki.contrib.rendering.markdown.commonmark12.internal.MarkdownConfiguration;
 import org.xwiki.rendering.listener.Listener;
+import org.xwiki.rendering.parser.StreamParser;
 
+import com.vladsch.flexmark.ast.HardLineBreak;
 import com.vladsch.flexmark.ast.Paragraph;
+import com.vladsch.flexmark.ast.SoftLineBreak;
+import com.vladsch.flexmark.ast.Text;
 import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.util.ast.NodeVisitor;
 import com.vladsch.flexmark.util.ast.VisitHandler;
@@ -54,9 +58,9 @@ public class ParagraphNodeVisitor extends AbstractNodeVisitor
     }
 
     public ParagraphNodeVisitor(NodeVisitor visitor, Deque<Listener> listeners,
-        MarkdownConfiguration configuration)
+        MarkdownConfiguration configuration, org.xwiki.rendering.parser.StreamParser plainTextStreamParser)
     {
-        super(visitor, listeners);
+        super(visitor, listeners, null, plainTextStreamParser);
         this.configuration = configuration;
     }
 
@@ -130,7 +134,7 @@ public class ParagraphNodeVisitor extends AbstractNodeVisitor
             return true;
         }
 
-        return false;
+        return emitEmbeddedBlockMath(node);
     }
 
     private String stripEnclosingLineBreaks(String value)
@@ -174,5 +178,97 @@ public class ParagraphNodeVisitor extends AbstractNodeVisitor
         StringBuilder builder = new StringBuilder();
         builder.append("\\[\n").append(trimmed).append('\n').append("\\]");
         return builder.toString();
+    }
+
+    /**
+     * Handle paragraphs that mix regular text with display math delimited by {@code $$}.
+     */
+    private boolean emitEmbeddedBlockMath(Paragraph node)
+    {
+        boolean foundBlock = false;
+        StringBuilder buffer = new StringBuilder();
+        boolean paragraphOpen = false;
+
+        for (Node child = node.getFirstChild(); child != null; child = child.getNext()) {
+            if (child instanceof Text) {
+                String value = child.getChars().toString();
+                int index = 0;
+                while (index < value.length()) {
+                    int open = value.indexOf("$$", index);
+                    if (open == -1) {
+                        buffer.append(value.substring(index));
+                        break;
+                    }
+
+                    int close = findClosingDoubleDollar(value, open + 2);
+                    if (close == -1) {
+                        buffer.append(value.substring(index));
+                        break;
+                    }
+
+                    buffer.append(value, index, open);
+                    paragraphOpen = flushBuffer(buffer, paragraphOpen);
+
+                    String content = value.substring(open + 2, close);
+                    String stripped = stripEnclosingLineBreaks(content);
+                    if (stripped.trim().isEmpty()) {
+                        buffer.append(value, open, close + 2);
+                    } else {
+                        paragraphOpen = closeParagraph(paragraphOpen);
+                        emitBlockMacro(stripped);
+                        foundBlock = true;
+                    }
+
+                    index = close + 2;
+                }
+            } else if (child instanceof SoftLineBreak) {
+                buffer.append(' ');
+            } else if (child instanceof HardLineBreak) {
+                paragraphOpen = flushBuffer(buffer, paragraphOpen);
+                paragraphOpen = ensureParagraph(paragraphOpen);
+                getListener().onNewLine();
+            } else {
+                paragraphOpen = flushBuffer(buffer, paragraphOpen);
+                paragraphOpen = ensureParagraph(paragraphOpen);
+                getVisitor().visit(child);
+            }
+        }
+
+        paragraphOpen = flushBuffer(buffer, paragraphOpen);
+        closeParagraph(paragraphOpen);
+
+        return foundBlock;
+    }
+
+    private int findClosingDoubleDollar(String text, int searchStart)
+    {
+        return text.indexOf("$$", searchStart);
+    }
+
+    private boolean flushBuffer(StringBuilder buffer, boolean paragraphOpen)
+    {
+        if (buffer.length() > 0) {
+            paragraphOpen = ensureParagraph(paragraphOpen);
+            parseInline(buffer.toString());
+            buffer.setLength(0);
+        }
+        return paragraphOpen;
+    }
+
+    private boolean ensureParagraph(boolean paragraphOpen)
+    {
+        if (!paragraphOpen) {
+            getListener().beginParagraph(Collections.emptyMap());
+            paragraphOpen = true;
+        }
+        return paragraphOpen;
+    }
+
+    private boolean closeParagraph(boolean paragraphOpen)
+    {
+        if (paragraphOpen) {
+            getListener().endParagraph(Collections.emptyMap());
+        }
+        return false;
     }
 }

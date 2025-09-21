@@ -137,7 +137,7 @@ public class DefaultFlexmarkNodeVisitor implements FlexmarkNodeVisitor
 
         // Handle Paragraph nodes
         ParagraphNodeVisitor paragraphNodeVisitor = new ParagraphNodeVisitor(this.visitor, this.listeners,
-            this.configuration);
+            this.configuration, this.plainTextStreamParser);
         this.visitor.addHandlers(ParagraphNodeVisitor.VISIT_HANDLERS(paragraphNodeVisitor));
 
         // Handle Image nodes

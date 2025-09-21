@@ -4,6 +4,8 @@
 package org.xwiki.contrib.rendering.markdown.commonmark12.internal;
 
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -70,6 +72,35 @@ public class MarkdownMathBasicTest
         assertEquals("\\[\n\\begin{equation}\ny = \\frac{c}{cb-ad}\n\\end{equation}\n\\]", content);
     }
 
+    @Test
+    public void mathInsideListItemsIsDetected() throws Exception
+    {
+        registerMinimalMocks();
+
+        Parser parser = this.mocker.getInstance(Parser.class, "markdown-math/1.0");
+        String sample = "Given data of $x$:\n\n- Optimize flow:\n  $$ x^2 + y^2 = z^2 $$\n"
+            + "- Subsidize point:   $$ 4 + 5 = 9 $$\n";
+        XDOM xdom = parser.parse(new StringReader(sample));
+
+        List<MacroBlock> macros = findMathMacros(xdom);
+        List<MacroBlock> inlineMacros = new ArrayList<>();
+        List<MacroBlock> blockMacros = new ArrayList<>();
+        for (MacroBlock macro : macros) {
+            if (macro.isInline()) {
+                inlineMacros.add(macro);
+            } else {
+                blockMacros.add(macro);
+            }
+        }
+
+        assertEquals("Expected inline math span for $x$", 1, inlineMacros.size());
+        assertEquals("\\(x\\)", inlineMacros.get(0).getContent());
+
+        assertEquals("Expected two block math macros", 2, blockMacros.size());
+        assertEquals("\\[\nx^2 + y^2 = z^2\n\\]", blockMacros.get(0).getContent());
+        assertEquals("\\[\n4 + 5 = 9\n\\]", blockMacros.get(1).getContent());
+    }
+
     private void registerMinimalMocks() throws Exception
     {
         this.mocker.registerMockComponent(org.xwiki.rendering.parser.StreamParser.class, "plain/1.0");
@@ -107,4 +138,31 @@ public class MarkdownMathBasicTest
         }
         return null;
     }
+
+    private List<MacroBlock> findMathMacros(Block block)
+    {
+        List<MacroBlock> macros = new ArrayList<>();
+        if (block instanceof MacroBlock) {
+            MacroBlock macroBlock = (MacroBlock) block;
+            if ("mathjax".equals(macroBlock.getId())) {
+                macros.add(macroBlock);
+            }
+        }
+
+        for (Block child : block.getChildren()) {
+            macros.addAll(findMathMacros(child));
+        }
+
+        return macros;
+    }
+
+    private List<MacroBlock> findMathMacros(XDOM xdom)
+    {
+        List<MacroBlock> macros = new ArrayList<>();
+        for (Block block : xdom.getChildren()) {
+            macros.addAll(findMathMacros(block));
+        }
+        return macros;
+    }
+
 }

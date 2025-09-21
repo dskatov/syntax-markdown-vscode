@@ -8,10 +8,7 @@
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-onWord [2]
-beginFormat [SUPERSCRIPT]
-onWord [10]
-endFormat [SUPERSCRIPT]
+onWord [2^10^]
 onSpace
 onWord [is]
 onSpace
@@ -19,3 +16,7 @@ onWord [1024]
 onSpecialSymbol [.]
 endParagraph
 endDocument
+.#-----------------------------------------------------
+.expect|markdown/1.2
+.#-----------------------------------------------------
+2^10^ is 1024.

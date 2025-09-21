@@ -34,7 +34,7 @@ import org.xwiki.contrib.rendering.markdown.commonmark12.internal.MarkdownConfig
  * @since 8.4
  */
 @Component
-@Named("markdown/1.2")
+@Named("markdown-math/1.0")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class Markdown12Renderer extends AbstractMarkdownRenderer
 {

@@ -8,11 +8,7 @@ H~2~O is a liquid.
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-onWord [H]
-beginFormat [SUBSCRIPT]
-onWord [2]
-endFormat [SUBSCRIPT]
-onWord [O]
+onWord [H~2~O]
 onSpace
 onWord [is]
 onSpace
@@ -22,3 +18,7 @@ onWord [liquid]
 onSpecialSymbol [.]
 endParagraph
 endDocument
+.#-----------------------------------------------------
+.expect|markdown/1.2
+.#-----------------------------------------------------
+H~2~O is a liquid.

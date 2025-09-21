@@ -22,6 +22,7 @@ package org.xwiki.contrib.rendering.markdown.commonmark12.internal.parser;
 import java.util.Collections;
 import java.util.Deque;
 
+import org.xwiki.contrib.rendering.markdown.commonmark12.internal.MarkdownConfiguration;
 import org.xwiki.rendering.listener.Listener;
 
 import com.vladsch.flexmark.ast.Paragraph;
@@ -29,13 +30,15 @@ import com.vladsch.flexmark.util.ast.NodeVisitor;
 import com.vladsch.flexmark.util.ast.VisitHandler;
 
 /**
- * Handle paragraph events.
+ * Handle paragraph events and upgrade $$ math blocks to macros.
  *
  * @version $Id$
  * @since 8.4
  */
 public class ParagraphNodeVisitor extends AbstractNodeVisitor
 {
+    private final MarkdownConfiguration configuration;
+
     static <V extends ParagraphNodeVisitor> VisitHandler<?>[] VISIT_HANDLERS(final V visitor)
     {
         return new VisitHandler<?>[]{
@@ -43,16 +46,62 @@ public class ParagraphNodeVisitor extends AbstractNodeVisitor
         };
     }
 
-    public ParagraphNodeVisitor(NodeVisitor visitor, Deque<Listener> listeners)
+    public ParagraphNodeVisitor(NodeVisitor visitor, Deque<Listener> listeners,
+        MarkdownConfiguration configuration)
     {
         super(visitor, listeners);
+        this.configuration = configuration;
     }
 
     public void visit(Paragraph node)
     {
+        if (emitBlockMath(node)) {
+            return;
+        }
+
         getListener().beginParagraph(Collections.emptyMap());
         getVisitor().visitChildren(node);
         getListener().endParagraph(Collections.emptyMap());
+    }
 
+    private boolean emitBlockMath(Paragraph node)
+    {
+        String raw = node.getChars().toString();
+        String trimmed = raw.trim();
+        if (!trimmed.startsWith("$$") || !trimmed.endsWith("$$") || trimmed.length() <= 4) {
+            return false;
+        }
+
+        if (trimmed.indexOf("$$", 2) != trimmed.length() - 2) {
+            return false;
+        }
+
+        String content = trimmed.substring(2, trimmed.length() - 2);
+        content = stripEnclosingLineBreaks(content);
+        if (content.trim().isEmpty()) {
+            return false;
+        }
+
+        getListener().onMacro(this.configuration.getMathMacroId(),
+            this.configuration.getBlockMathMacroParameters(), content.trim(), false);
+        return true;
+    }
+
+    private String stripEnclosingLineBreaks(String value)
+    {
+        int start = 0;
+        int end = value.length();
+        while (start < end && isLineBreak(value.charAt(start))) {
+            start++;
+        }
+        while (end > start && isLineBreak(value.charAt(end - 1))) {
+            end--;
+        }
+        return value.substring(start, end);
+    }
+
+    private boolean isLineBreak(char character)
+    {
+        return character == '\n' || character == '\r';
     }
 }

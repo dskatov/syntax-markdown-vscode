@@ -30,11 +30,6 @@ import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.renderer.reference.ResourceReferenceSerializer;
 
-import com.vladsch.flexmark.ext.gfm.strikethrough.StrikethroughExtension;
-import com.vladsch.flexmark.ext.gfm.strikethrough.StrikethroughSubscriptExtension;
-import com.vladsch.flexmark.parser.Parser;
-import com.vladsch.flexmark.util.misc.Extension;
-
 /**
  * Convert listener events to Markdown 1.2.
  *
@@ -43,8 +38,6 @@ import com.vladsch.flexmark.util.misc.Extension;
  */
 public class Markdown12ChainingRenderer extends Markdown11ChainingRenderer
 {
-    private static final String STRIKEDOUT_SYMBOL = "~~";
-
     private static final char QUOTE = '"';
 
     private static final String FORMAT_TWO_PARAMS = "[[%s|%s]]";
@@ -52,8 +45,6 @@ public class Markdown12ChainingRenderer extends Markdown11ChainingRenderer
     private static final String FORMAT_THREE_PARAMS = "[[%s|%s|%s]]";
 
     private MarkdownConfiguration configuration;
-
-    private boolean isStrikethroughSupported;
 
     /**
      * @param listenerChain the chain of listener filters used to compute various states
@@ -66,49 +57,18 @@ public class Markdown12ChainingRenderer extends Markdown11ChainingRenderer
     {
         super(listenerChain, linkReferenceSerializer, imageReferenceSerializer);
         this.configuration = configuration;
-        this.isStrikethroughSupported = isStrikethroughSupported();
     }
 
     @Override
     public void beginFormat(Format format, Map<String, String> parameters)
     {
-        if (format.equals(Format.STRIKEDOUT) && this.isStrikethroughSupported) {
-            print(STRIKEDOUT_SYMBOL);
-        } else {
-            // Override from Markdown11ChainingRenderer since there's no need to escape space characters with
-            //flexmark-java.
-            switch (format) {
-                case SUPERSCRIPT:
-                    print(SUPERSCRIPT_SYMBOL);
-                    break;
-                case SUBSCRIPT:
-                    print(SUBSCRIPT_SYMBOL);
-                    break;
-                default:
-                    super.beginFormat(format, parameters);
-            }
-        }
+        super.beginFormat(format, parameters);
     }
 
     @Override
     public void endFormat(Format format, Map<String, String> parameters)
     {
-        if (format.equals(Format.STRIKEDOUT) && this.isStrikethroughSupported) {
-            print(STRIKEDOUT_SYMBOL);
-        } else {
-            // Override from Markdown11ChainingRenderer since there's no need to escape space characters with
-            //flexmark-java.
-            switch (format) {
-                case SUPERSCRIPT:
-                    print(SUPERSCRIPT_SYMBOL);
-                    break;
-                case SUBSCRIPT:
-                    print(SUBSCRIPT_SYMBOL);
-                    break;
-                default:
-                    super.endFormat(format, parameters);
-            }
-        }
+        super.endFormat(format, parameters);
     }
 
     @Override
@@ -139,16 +99,11 @@ public class Markdown12ChainingRenderer extends Markdown11ChainingRenderer
 
     private String escapeLinkReference(String rawReference)
     {
-        String escapedReference;
-
-        // Escape any ( or ) to avoid issue with the link syntax.
-        // e.g. [label](https://en.wikipedia.org/Some_Subject_\(With_Title\))
-        // See http://spec.commonmark.org/0.27/#links
-        escapedReference = rawReference.replaceAll("\\(", "\\\\(");
-        escapedReference = escapedReference.replaceAll("\\)", "\\\\)");
-
+        String escapedReference = rawReference.replace("(", "\\(");
+        escapedReference = escapedReference.replace(")", "\\)");
         return escapedReference;
     }
+
 
     @Override
     public void onImage(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
@@ -205,16 +160,6 @@ public class Markdown12ChainingRenderer extends Markdown11ChainingRenderer
     protected MarkdownMacroRenderer createMacroPrinter()
     {
         return new Markdown12MacroRenderer();
-    }
-
-    private boolean isStrikethroughSupported()
-    {
-        for (Extension extension : Parser.EXTENSIONS.get(this.configuration.getOptions())) {
-             if (extension instanceof StrikethroughExtension || extension instanceof StrikethroughSubscriptExtension) {
-                 return true;
-             }
-        }
-        return false;
     }
 
     protected boolean handleHtmlMacro(String id, Map<String, String> parameters, String content, boolean isInline)

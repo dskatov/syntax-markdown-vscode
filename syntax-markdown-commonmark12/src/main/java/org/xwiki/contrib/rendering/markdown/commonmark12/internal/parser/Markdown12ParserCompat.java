@@ -24,37 +24,33 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.contrib.rendering.markdown.commonmark12.internal.CommonMark12SyntaxProvider;
 import org.xwiki.rendering.parser.StreamParser;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxType;
 
 /**
- * CommonMark Markdown Parser using <a href="https://github.com/vsch/flexmark-java">flexmark-java</a>.
- *
- * @version $Id$
- * @since 8.4
+ * Compatibility parser registering the original hint {@code markdown/1.2}
+ * to ensure existing pages and defaults continue to work when this module is present.
  */
 @Component
-@Named("markdown-math/1.0")
+@Named("markdown/1.2")
 @Singleton
-public class Markdown12Parser extends AbstractMarkdownParser
+public class Markdown12ParserCompat extends AbstractMarkdownParser
 {
-    /**
-     * Streaming Markdown Parser.
-     */
     @Inject
-    @Named("markdown-math/1.0")
-    private StreamParser commonMarkStreamParser;
+    @Named("markdown/1.2")
+    private StreamParser compatStreamParser;
 
     @Override
     protected StreamParser getMarkdownStreamParser()
     {
-        return this.commonMarkStreamParser;
+        return this.compatStreamParser;
     }
 
     @Override
     public Syntax getSyntax()
     {
-        return CommonMark12SyntaxProvider.MARKDOWN_MATH_1_0;
+        return new Syntax(new SyntaxType("markdown", "CommonMark Markdown"), "1.2");
     }
 }
+

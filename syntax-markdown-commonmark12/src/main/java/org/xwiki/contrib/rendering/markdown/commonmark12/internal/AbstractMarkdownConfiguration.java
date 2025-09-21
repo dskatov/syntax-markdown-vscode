@@ -30,8 +30,6 @@ import org.slf4j.Logger;
 import com.vladsch.flexmark.ext.abbreviation.AbbreviationExtension;
 import com.vladsch.flexmark.ext.autolink.AutolinkExtension;
 import com.vladsch.flexmark.ext.definition.DefinitionExtension;
-import com.vladsch.flexmark.ext.gfm.strikethrough.StrikethroughSubscriptExtension;
-import com.vladsch.flexmark.ext.superscript.SuperscriptExtension;
 import com.vladsch.flexmark.ext.tables.TablesExtension;
 import com.vladsch.flexmark.ext.wikilink.WikiLinkExtension;
 import com.vladsch.flexmark.ext.xwiki.macros.MacroExtension;
@@ -55,8 +53,6 @@ public abstract class AbstractMarkdownConfiguration
         AutolinkExtension.class,
         DefinitionExtension.class,
         TablesExtension.class,
-        StrikethroughSubscriptExtension.class,
-        SuperscriptExtension.class,
         AbbreviationExtension.class,
         MacroExtension.class
     );

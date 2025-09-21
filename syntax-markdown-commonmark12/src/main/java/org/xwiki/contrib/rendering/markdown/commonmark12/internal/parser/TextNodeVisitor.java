@@ -21,6 +21,7 @@ package org.xwiki.contrib.rendering.markdown.commonmark12.internal.parser;
 
 import java.util.Deque;
 
+import org.xwiki.contrib.rendering.markdown.commonmark12.internal.MarkdownConfiguration;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.parser.StreamParser;
 
@@ -29,13 +30,15 @@ import com.vladsch.flexmark.util.ast.NodeVisitor;
 import com.vladsch.flexmark.util.ast.VisitHandler;
 
 /**
- * Handle text events.
+ * Handle text events, including converting inline math spans to macros.
  *
  * @version $Id$
  * @since 8.4
  */
 public class TextNodeVisitor extends AbstractNodeVisitor
 {
+    private final MarkdownConfiguration configuration;
+
     static <V extends TextNodeVisitor> VisitHandler<?>[] VISIT_HANDLERS(final V visitor)
     {
         return new VisitHandler<?>[]{
@@ -43,16 +46,114 @@ public class TextNodeVisitor extends AbstractNodeVisitor
         };
     }
 
-    public TextNodeVisitor(NodeVisitor visitor, Deque<Listener> listeners, StreamParser plainTextStreamParser)
+    public TextNodeVisitor(NodeVisitor visitor, Deque<Listener> listeners,
+        StreamParser plainTextStreamParser, MarkdownConfiguration configuration)
     {
         super(visitor, listeners, null, plainTextStreamParser);
+        this.configuration = configuration;
     }
 
     public void visit(Text node)
     {
-        parseInline(node.getChars().toString());
-
-        // Descend into children (could be omitted in this case because Text nodes don't have children).
+        process(node.getChars().toString());
         getVisitor().visitChildren(node);
+    }
+
+    private void process(String value)
+    {
+        int index = 0;
+        while (index < value.length()) {
+            int open = value.indexOf('$', index);
+            if (open == -1) {
+                emitPlain(value.substring(index));
+                break;
+            }
+
+            if (isEscaped(value, open)) {
+                emitPlain(value.substring(index, open + 1));
+                index = open + 1;
+                continue;
+            }
+
+            int run = countRun(value, open);
+            if (run != 1) {
+                emitPlain(value.substring(index, open + run));
+                index = open + run;
+                continue;
+            }
+
+            int close = findClosing(value, open + 1);
+            if (close == -1) {
+                emitPlain(value.substring(index));
+                break;
+            }
+
+            String between = value.substring(open + 1, close);
+            if (between.isEmpty() || containsLineBreak(between)) {
+                emitPlain(value.substring(index, close + 1));
+                index = close + 1;
+                continue;
+            }
+
+            emitPlain(value.substring(index, open));
+            emitInlineMath(between.trim());
+            index = close + 1;
+        }
+    }
+
+    private void emitPlain(String text)
+    {
+        if (!text.isEmpty()) {
+            parseInline(text);
+        }
+    }
+
+    private void emitInlineMath(String content)
+    {
+        if (content.isEmpty()) {
+            return;
+        }
+        getListener().onMacro(this.configuration.getMathMacroId(),
+            this.configuration.getInlineMathMacroParameters(), content, true);
+    }
+
+    private int findClosing(String text, int start)
+    {
+        int length = text.length();
+        for (int i = start; i < length; i++) {
+            if (text.charAt(i) != '$') {
+                continue;
+            }
+            if (isEscaped(text, i)) {
+                continue;
+            }
+            if (countRun(text, i) == 1) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private int countRun(String text, int start)
+    {
+        int index = start;
+        while (index < text.length() && text.charAt(index) == '$') {
+            index++;
+        }
+        return index - start;
+    }
+
+    private boolean isEscaped(String text, int position)
+    {
+        int backslashes = 0;
+        for (int i = position - 1; i >= 0 && text.charAt(i) == '\\'; i--) {
+            backslashes++;
+        }
+        return (backslashes & 1) == 1;
+    }
+
+    private boolean containsLineBreak(String text)
+    {
+        return text.indexOf('\n') >= 0 || text.indexOf('\r') >= 0;
     }
 }

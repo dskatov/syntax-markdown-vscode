@@ -12,13 +12,15 @@ onWord [This]
 onSpace
 onWord [is]
 onSpace
-beginFormat [SUPERSCRIPT]
-onWord [superscript]
+onWord [^superscript]
 onSpace
 onWord [with]
 onSpace
-onWord [spaces]
-endFormat [SUPERSCRIPT]
+onWord [spaces^]
 onSpecialSymbol [.]
 endParagraph
 endDocument
+.#-----------------------------------------------------
+.expect|markdown/1.2
+.#-----------------------------------------------------
+This is ^superscript with spaces^.

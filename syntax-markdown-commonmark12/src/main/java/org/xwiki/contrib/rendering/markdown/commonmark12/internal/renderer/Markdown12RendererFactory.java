@@ -26,7 +26,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.internal.renderer.AbstractPrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
 
-import static org.xwiki.contrib.rendering.markdown.commonmark12.internal.CommonMark12SyntaxProvider.MARKDOWN_COMMON_1_2;
+import static org.xwiki.contrib.rendering.markdown.commonmark12.internal.CommonMark12SyntaxProvider.MARKDOWN_MATH_1_0;
 
 /**
  * Create CommonMark Markdown 1.2 Renderers.
@@ -35,13 +35,13 @@ import static org.xwiki.contrib.rendering.markdown.commonmark12.internal.CommonM
  * @since 8.4
  */
 @Component
-@Named("markdown/1.2")
+@Named("markdown-math/1.0")
 @Singleton
 public class Markdown12RendererFactory extends AbstractPrintRendererFactory
 {
     @Override
     public Syntax getSyntax()
     {
-        return MARKDOWN_COMMON_1_2;
+        return MARKDOWN_MATH_1_0;
     }
 }

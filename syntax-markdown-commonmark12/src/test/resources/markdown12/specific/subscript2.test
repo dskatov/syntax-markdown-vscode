@@ -12,13 +12,15 @@ onWord [This]
 onSpace
 onWord [is]
 onSpace
-beginFormat [SUBSCRIPT]
-onWord [subscript]
+onWord [~subscript]
 onSpace
 onWord [with]
 onSpace
-onWord [spaces]
-endFormat [SUBSCRIPT]
+onWord [spaces~]
 onSpecialSymbol [.]
 endParagraph
 endDocument
+.#-----------------------------------------------------
+.expect|markdown/1.2
+.#-----------------------------------------------------
+This is ~subscript with spaces~.

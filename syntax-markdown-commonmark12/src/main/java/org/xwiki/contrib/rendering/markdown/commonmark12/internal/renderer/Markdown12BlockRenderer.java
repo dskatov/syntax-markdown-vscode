@@ -34,12 +34,12 @@ import org.xwiki.rendering.renderer.PrintRendererFactory;
  * @since 8.4
  */
 @Component
-@Named("markdown/1.2")
+@Named("markdown-math/1.0")
 @Singleton
 public class Markdown12BlockRenderer extends AbstractBlockRenderer
 {
     @Inject
-    @Named("markdown/1.2")
+    @Named("markdown-math/1.0")
     private PrintRendererFactory markdownRendererFactory;
 
     @Override

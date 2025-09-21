@@ -90,6 +90,32 @@
       </plugins>
     </pluginManagement>
   </build>
+  <repositories>
+    <repository>
+      <id>xwiki-public</id>
+      <name>XWiki Public Group</name>
+      <url>https://nexus.xwiki.org/nexus/content/groups/public/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>xwiki-public-plugins</id>
+      <name>XWiki Public Plugins</name>
+      <url>https://nexus.xwiki.org/nexus/content/groups/public/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </pluginRepository>
+  </pluginRepositories>
   <profiles>
     <profile>
       <!-- Profile used when the release plugin executes. -->

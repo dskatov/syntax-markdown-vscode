@@ -30,6 +30,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.contrib.rendering.markdown.commonmark12.internal.MarkdownConfiguration;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.parser.ResourceReferenceParser;
@@ -85,6 +86,9 @@ public class DefaultFlexmarkNodeVisitor implements FlexmarkNodeVisitor
     @Inject
     private ComponentManager componentManager;
 
+    @Inject
+    private MarkdownConfiguration configuration;
+
     /**
      * Handle Document nodes.
      */
@@ -123,7 +127,8 @@ public class DefaultFlexmarkNodeVisitor implements FlexmarkNodeVisitor
         this.visitor = new NodeVisitor(VISIT_HANDLERS(this));
 
         // Handle Text nodes
-        TextNodeVisitor textNodeVisitor = new TextNodeVisitor(this.visitor, this.listeners, this.plainTextStreamParser);
+        TextNodeVisitor textNodeVisitor = new TextNodeVisitor(this.visitor, this.listeners, this.plainTextStreamParser,
+            this.configuration);
         this.visitor.addHandlers(TextNodeVisitor.VISIT_HANDLERS(textNodeVisitor));
 
         // Handle Emphasis nodes
@@ -131,7 +136,8 @@ public class DefaultFlexmarkNodeVisitor implements FlexmarkNodeVisitor
         this.visitor.addHandlers(EmphasisNodeVisitor.VISIT_HANDLERS(emphasisNodeVisitor));
 
         // Handle Paragraph nodes
-        ParagraphNodeVisitor paragraphNodeVisitor = new ParagraphNodeVisitor(this.visitor, this.listeners);
+        ParagraphNodeVisitor paragraphNodeVisitor = new ParagraphNodeVisitor(this.visitor, this.listeners,
+            this.configuration);
         this.visitor.addHandlers(ParagraphNodeVisitor.VISIT_HANDLERS(paragraphNodeVisitor));
 
         // Handle Image nodes
@@ -161,16 +167,6 @@ public class DefaultFlexmarkNodeVisitor implements FlexmarkNodeVisitor
         TableNodeVisitor tableNodeVisitor = new TableNodeVisitor(this.visitor, this.listeners,
             this.plainRendererFactory);
         this.visitor.addHandlers(TableNodeVisitor.VISIT_HANDLERS(tableNodeVisitor));
-
-        // Handle strikethrough nodes
-        StrikethroughNodeVisitor strikethroughNodeVisitor =
-            new StrikethroughNodeVisitor(this.visitor, this.listeners);
-        this.visitor.addHandlers(StrikethroughNodeVisitor.VISIT_HANDLERS(strikethroughNodeVisitor));
-
-        // Handle superscript and subscript nodes
-        SubSuperscriptNodeVisitor subSuperscriptNodeVisitor =
-            new SubSuperscriptNodeVisitor(this.visitor, this.listeners);
-        this.visitor.addHandlers(SubSuperscriptNodeVisitor.VISIT_HANDLERS(subSuperscriptNodeVisitor));
 
         // Handle HTML nodes
         HTMLNodeVisitor htmlNodeVisitor = new HTMLNodeVisitor(this.visitor, this.listeners);

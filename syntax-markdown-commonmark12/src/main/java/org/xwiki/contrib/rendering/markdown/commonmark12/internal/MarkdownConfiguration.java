@@ -19,6 +19,9 @@
  */
 package org.xwiki.contrib.rendering.markdown.commonmark12.internal;
 
+import java.util.Collections;
+import java.util.Map;
+
 import org.xwiki.component.annotation.Role;
 
 import com.vladsch.flexmark.util.data.MutableDataHolder;
@@ -27,4 +30,20 @@ import com.vladsch.flexmark.util.data.MutableDataHolder;
 public interface MarkdownConfiguration
 {
     MutableDataHolder getOptions();
+
+    default String getMathMacroId()
+    {
+        // Use a unique system property key to avoid clashes with stock Markdown 1.2
+        return System.getProperty("xwiki.markdownmath10.math.macro", "mathjax");
+    }
+
+    default Map<String, String> getInlineMathMacroParameters()
+    {
+        return Collections.emptyMap();
+    }
+
+    default Map<String, String> getBlockMathMacroParameters()
+    {
+        return Collections.emptyMap();
+    }
 }

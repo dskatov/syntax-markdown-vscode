@@ -31,29 +31,29 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxType;
 
 /**
- * Register the {@code markdown/1.2} Syntax supported by this module.
+ * Register the {@code markdown-math/1.0} Syntax supported by this module.
  *
  * @version $Id$
  * @since 8.8
  */
 @Component
-@Named("markdown/1.2")
+@Named("markdown-math/1.0")
 @Singleton
 public class CommonMark12SyntaxProvider implements Provider<List<Syntax>>
 {
     /**
-     * Common Markdown syntax type.
+     * Markdown with Math syntax type.
      */
-    public static final SyntaxType MARKDOWN_COMMON = new SyntaxType("markdown", "CommonMark Markdown");
+    public static final SyntaxType MARKDOWN_MATH = new SyntaxType("markdown-math", "Markdown with Math");
 
     /**
-     * Common Markdown 1.2 syntax.
+     * Markdown Math 1.0 syntax.
      */
-    public static final Syntax MARKDOWN_COMMON_1_2 = new Syntax(MARKDOWN_COMMON, "1.2");
+    public static final Syntax MARKDOWN_MATH_1_0 = new Syntax(MARKDOWN_MATH, "1.0");
 
     @Override
     public List<Syntax> get()
     {
-        return Collections.singletonList(MARKDOWN_COMMON_1_2);
+        return Collections.singletonList(MARKDOWN_MATH_1_0);
     }
 }

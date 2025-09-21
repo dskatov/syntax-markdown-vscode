@@ -28,35 +28,41 @@
     <version>12.10-3</version>
   </parent>
   <groupId>org.xwiki.contrib.markdown</groupId>
-  <artifactId>syntax-markdown</artifactId>
-  <version>8.9.1-SNAPSHOT</version>
-  <name>Markdown Syntax - Parent POM</name>
-  <description>Parent POM for Markdown syntax modules</description>
+  <artifactId>markdown-withmath-parent</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <name>Markdown With Math - Parent POM</name>
+  <description>Parent POM for the markdown-withmath distribution</description>
   <packaging>pom</packaging>
   <scm>
-    <connection>scm:git:git://github.com/xwiki-contrib/syntax-markdown.git</connection>
-    <developerConnection>scm:git:git@github.com:xwiki-contrib/syntax-markdown.git</developerConnection>
-    <url>https://github.com/xwiki-contrib/syntax-markdown/tree/master</url>
+    <connection>scm:git:https://github.com/danskatov/markdown-withmath.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/danskatov/markdown-withmath.git</developerConnection>
+    <url>https://github.com/danskatov/markdown-withmath</url>
     <tag>HEAD</tag>
   </scm>
   <developers>
     <developer>
-      <id>vmassol</id>
-      <name>Vincent Massol</name>
-    </developer>
-    <developer>
-      <id>haxsen</id>
-      <name>Hassan Ali</name>
-    </developer>
-    <developer>
-      <id>pjeanjean</id>
-      <name>Pierre Jeanjean</name>
-    </developer>
-    <developer>
-      <id>xwikidev</id>
-      <name>XWiki Development Team</name>
+      <id>danskatov</id>
+      <name>Daniel Skatov</name>
+      <email>danskatov@gmail.com</email>
+      <roles>
+        <role>lead</role>
+      </roles>
     </developer>
   </developers>
+  <contributors>
+    <contributor>
+      <name>Vincent Massol</name>
+    </contributor>
+    <contributor>
+      <name>Hassan Ali</name>
+    </contributor>
+    <contributor>
+      <name>Pierre Jeanjean</name>
+    </contributor>
+    <contributor>
+      <name>XWiki Development Team</name>
+    </contributor>
+  </contributors>
   <properties>
     <flexmark.version>0.64.8</flexmark.version>
     <!-- This extension needs to be installed at the farm level (ie in the root namespace) to work fine.
@@ -68,8 +74,7 @@
     <xwiki.java.version>11</xwiki.java.version>
   </properties>
   <modules>
-    <module>syntax-markdown-commonmark12</module>
-    <module>syntax-markdown-github10</module>
+    <module>markdown-withmath10</module>
   </modules>
   <build>
     <pluginManagement>

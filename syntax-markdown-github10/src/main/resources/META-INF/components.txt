@@ -1,7 +1,0 @@
-org.xwiki.contrib.rendering.markdown.github10.internal.parser.MarkdownGitHubParser
-org.xwiki.contrib.rendering.markdown.github10.internal.parser.MarkdownGitHubStreamParser
-org.xwiki.contrib.rendering.markdown.github10.internal.MarkdownGitHubConfiguration
-org.xwiki.contrib.rendering.markdown.github10.internal.renderer.MarkdownGitHubBlockRenderer
-org.xwiki.contrib.rendering.markdown.github10.internal.renderer.MarkdownGitHubRenderer
-org.xwiki.contrib.rendering.markdown.github10.internal.renderer.MarkdownGitHubRendererFactory
-org.xwiki.contrib.rendering.markdown.github10.internal.GitHubMarkdown10SyntaxProvider

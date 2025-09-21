@@ -1,0 +1,10 @@
+Markdown With Math 1.0
+Copyright (c) 2025 Daniel Skatov
+
+This project derives from the XWiki Contrib "syntax-markdown" extension (https://github.com/xwiki-contrib/syntax-markdown) which is
+Copyright (c) 2006-2024 XWiki SAS and contributors.
+
+The original code base is released under the GNU Lesser General Public License version 2.1 or later.
+This fork retains the same license; see LICENSE for the complete terms.
+
+Notable upstream contributors include Vincent Massol, Hassan Ali, Pierre Jeanjean, and the XWiki Development Team.

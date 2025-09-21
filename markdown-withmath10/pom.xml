@@ -24,8 +24,8 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.contrib.markdown</groupId>
-    <artifactId>syntax-markdown</artifactId>
-    <version>8.9.1-SNAPSHOT</version>
+    <artifactId>markdown-withmath-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>syntax-markdown-math10</artifactId>
   <version>16.5.0-math1.0</version>

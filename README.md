@@ -1,17 +1,10 @@
-# Markdown Syntaxes
+# Markdown With Math 1.0
 
-Parsers and Renderers for Markdown syntaxes.
+Markdown With Math packages the XWiki CommonMark 1.2 syntax with LaTeX inline and block detection while keeping the upstream feature set intact. This repository is a derivative work of the [xwiki-contrib/syntax-markdown](https://github.com/xwiki-contrib/syntax-markdown) extension and remains under the GNU LGPL 2.1 (see LICENSE and NOTICE).
 
-* Project Lead: [Vincent Massol](https://www.xwiki.org/xwiki/bin/view/XWiki/VincentMassol)
-* [Documentation & Downloads](https://extensions.xwiki.org/xwiki/bin/view/Extension/Markdown%20Syntax%201.2)
-* [Issue Tracker](https://jira.xwiki.org/browse/MARKDOWN)
-* Communication: [Forum](https://forum.xwiki.org), [Chat](https://dev.xwiki.org/xwiki/bin/view/Community/Chat)
-* [Development Practices](https://dev.xwiki.org)
-* Minimal XWiki version supported: XWiki 12.10
-* License: LGPL 2.1
-* Translations: N/A
-* Sonar Dashboard: N/A
-* Continuous Integration Status: [![Build Status](http://ci.xwiki.org/job/XWiki%20Contrib/job/syntax-markdown/job/master/badge/icon)](http://ci.xwiki.org/job/XWiki%20Contrib/job/syntax-markdown/job/master/)
+**Maintainer:** Daniel Skatov (<danskatov@gmail.com>)
+
+**Upstream credits:** Vincent Massol, Hassan Ali, Pierre Jeanjean, the XWiki Development Team, and the wider XWiki Contrib community.
 
 ## Math Support (CommonMark 1.2)
 
@@ -31,7 +24,7 @@ To render math on pages, install the corresponding macro extension in XWiki:
 ## Build & Install (Markdown Math 1.0)
 
 - Build: `mvn -DskipTests -DskipITs clean package`
-- Install farm-wide: upload the produced JAR(s) from `syntax-markdown-commonmark12/target/` with Extension Manager (Advanced -> Upload) or drop them in `<xwiki>/WEB-INF/lib` and restart.
+- Install farm-wide: upload the produced JAR(s) from `markdown-withmath10/target/` with Extension Manager (Advanced -> Upload) or drop them in `<xwiki>/WEB-INF/lib` and restart.
 - New syntax id: `markdown-math/1.0` (does not clash with stock `markdown/1.2`).
 
 ---
@@ -57,18 +50,27 @@ This document captures the end-to-end work done to add LaTeX math to XWiki's Mar
 ### Modules and Files
 
 - Core code changes live in:
-  - `syntax-markdown/syntax-markdown-commonmark12/src/main/java/...` (parsers, visitors, config)
-  - `syntax-markdown/syntax-markdown-commonmark12/pom.xml` (dependencies, shading, Java level)
+  - `syntax-markdown/markdown-withmath10/src/main/java/...` (parsers, visitors, config)
+  - `syntax-markdown/markdown-withmath10/pom.xml` (dependencies, shading, Java level)
 - Deployable JAR placed at:
   - `dist/math-milestone-aurora/syntax-markdown-math10-16.5.0-math1.0.jar`
 
 ## Repository Layout (2025-09-21)
 
-- `dist/` keeps shaded jars grouped by milestone tag (see `dist/README.md`).
-- `syntax-markdown-commonmark12/` hosts the CommonMark 1.2 + math module.
-- `syntax-markdown-github10/` remains the GFM 1.0 port (untouched here).
-- `.github/` carries CI workflows and release automation skeletons.
-- `target/` is Maven output (git-ignored).
+- markdown-withmath10/ hosts the math-enabled CommonMark 1.2 module (sources, tests, shading config).
+- dist/ keeps shaded jars grouped by milestone tag (see dist/README.md).
+- .github/ carries CI workflows and release automation skeletons.
+- 	arget/ is Maven output (git-ignored).
+
+## Upstream Delta
+
+- Removed the legacy GitHub 1.0 syntax module; this distribution focuses solely on the CommonMark 1.2 + math variant.
+- Renamed the module folder to markdown-withmath10 and parent POM to markdown-withmath-parent for clarity.
+- Added distribution metadata (dist/), NOTICE, and explicit LGPL 2.1 licensing files.
+
+## License
+
+This distribution remains under the GNU LGPL 2.1 (see LICENSE). Upstream authors are credited in NOTICE.
 
 ## Behavior Details
 
@@ -103,7 +105,7 @@ This document captures the end-to-end work done to add LaTeX math to XWiki's Mar
 ### Build locally (module only)
 
 - Build just the CommonMark 1.2 module (skip tests):
-  - Windows/PowerShell: `mvn -f syntax-markdown/syntax-markdown-commonmark12/pom.xml -DskipTests clean package`
+  - Windows/PowerShell: `mvn -f syntax-markdown/markdown-withmath10/pom.xml -DskipTests clean package`
 
 ### Deploy in Docker
 
@@ -153,7 +155,7 @@ This document captures the end-to-end work done to add LaTeX math to XWiki's Mar
 ## Tests
 
 - Minimal unit testing added to validate math blocks and spans produce macro blocks, including inline, blank-line, and list-item display math scenarios (see module's MarkdownMathBasicTest).
-- Run the focused regression suite locally with mvn -pl syntax-markdown-commonmark12 -am -Dtest=MarkdownMathBasicTest test.
+- Run the focused regression suite locally with mvn -pl markdown-withmath10 -am -Dtest=MarkdownMathBasicTest test.
 
 ## Current State (Working)
 
@@ -162,7 +164,7 @@ This document captures the end-to-end work done to add LaTeX math to XWiki's Mar
 - Autolink NoClassDefFoundError resolved (autolink shaded).
 - Deployable JAR prepared at `dist/math-milestone-aurora/syntax-markdown-math10-16.5.0-math1.0.jar`.
 
-- Targeted math suite (`MarkdownMathBasicTest`) passing as of 2025-09-21 10:23 CEST; refreshed jar staged at the same path.
+- Targeted math suite (`MarkdownMathBasicTest`) passing as of 2025-09-21 11:03 CEST; refreshed jar staged at the same path.
 
 ## Notes & Limits
 
@@ -194,12 +196,12 @@ This document captures the end-to-end work done to add LaTeX math to XWiki's Mar
 - Temporarily disabled subscript*.test and superscript*.test (renamed to .test.disabled) because expectations still assume literal parsing; noted this in the fixtures for follow-up.
 - Normalised the HTML fixtures to expect html/5.0 events emitted by the math renderer and corrected the math fixture so escaped dollars stay as plain $.
 
-- Reintroduced `MarkdownMathBasicTest` to lock inline `$...$` and block `$$...$$` parsing; run with `mvn -pl syntax-markdown-commonmark12 -Dtest=MarkdownMathBasicTest test -DskipITs`.
+- Reintroduced `MarkdownMathBasicTest` to lock inline `$...$` and block `$$...$$` parsing; run with `mvn -pl markdown-withmath10 -Dtest=MarkdownMathBasicTest test -DskipITs`.
 - Added a lightweight in-test stub for the `plain/1.0` stream parser so the regression suite can inspect paragraph content and guard against text duplication (runtime still relies on the real plain components).
 - Refined `ParagraphNodeVisitor.emitEmbeddedBlockMath` to dispatch plain segments through flexmark `Text` nodes, preventing duplicated paragraphs around display math while keeping inline math detection active.
   * Root cause: we previously fed prose back through `parseInline`, which replayed the same buffer twice and starved the inline visitor; that duplicated paragraph content and left `$...$` spans untreated. Now we wrap the plain slice in a flexmark `Text` node so the regular visitor path sees it exactly once and converts inline math as expected.
 - Test fixtures under `src/test/resources/markdown12/specific` now target `markdown-math/1.0` and include the sample math page.
-- `mvn -pl syntax-markdown-commonmark12 -am test -DskipITs` still fails: `markdown12/specific/math.test` and the subscript/superscript fixtures disagree on escaped dollars and `~`/`^` handling, and the configuration tests still lack realistic plain renderer/stream parser bindings.
+- `mvn -pl markdown-withmath10 -am test -DskipITs` still fails: `markdown12/specific/math.test` and the subscript/superscript fixtures disagree on escaped dollars and `~`/`^` handling, and the configuration tests still lack realistic plain renderer/stream parser bindings.
 
 
 

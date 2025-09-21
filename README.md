@@ -144,7 +144,8 @@ This document captures the end-to-end work done to add LaTeX math to XWiki's Mar
 
 ## Tests
 
-- Minimal unit testing added to validate math blocks and spans produce macro blocks (see module's test class), and manual verification in a running XWiki.
+- Minimal unit testing added to validate math blocks and spans produce macro blocks, including inline, blank-line, and list-item display math scenarios (see module's MarkdownMathBasicTest).
+- Run the focused regression suite locally with mvn -pl syntax-markdown-commonmark12 -am -Dtest=MarkdownMathBasicTest test.
 
 ## Current State (Working)
 

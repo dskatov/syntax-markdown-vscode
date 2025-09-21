@@ -35,7 +35,6 @@ onWord [Escaped]
 onSpace
 onWord [dollar]
 onSpace
-onWord [\]
 onSpecialSymbol [$]
 onSpace
 onWord [should]

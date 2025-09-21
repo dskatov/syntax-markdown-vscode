@@ -13,7 +13,7 @@ beginDocument
 beginParagraph
 onWord [hello]
 beginMacroMarkerInline [html] [clean=false] [<br/>]
-onRawText [<br/>] [xhtml/1.0]
+onRawText [<br/>] [html/5.0]
 endMacroMarkerInline [html] [clean=false] [<br/>]
 onWord [closing]
 onSpace
@@ -29,13 +29,13 @@ onWord [their]
 onSpace
 onWord [own]
 beginMacroMarkerInline [html] [clean=false] [</a>]
-onRawText [</a>] [xhtml/1.0]
+onRawText [</a>] [html/5.0]
 endMacroMarkerInline [html] [clean=false] [</a>]
 onSpace
 onWord [and]
 onSpace
 beginMacroMarkerInline [html] [clean=false] [<em>non closed run until the end of]
-onRawText [<em>non closed run until the end of] [xhtml/1.0]
+onRawText [<em>non closed run until the end of] [html/5.0]
 endMacroMarkerInline [html] [clean=false] [<em>non closed run until the end of]
 endParagraph
 beginParagraph
@@ -45,6 +45,6 @@ onWord [paragraph]
 endParagraph
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml/1.0
+.expect|html/5.0
 .#-----------------------------------------------------
 <p>hello<br/>closing tags are parsed on their own</a> and <em>non closed run until the end of</p><p>the paragraph</p>

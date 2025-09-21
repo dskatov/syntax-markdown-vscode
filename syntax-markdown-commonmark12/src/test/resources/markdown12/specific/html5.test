@@ -20,11 +20,11 @@ onSpace
 onWord [and]
 onSpace
 beginMacroMarkerInline [html] [clean=false] [<strong><em>bold + italic</em></strong>]
-onRawText [<strong><em>bold + italic</em></strong>] [xhtml/1.0]
+onRawText [<strong><em>bold + italic</em></strong>] [html/5.0]
 endMacroMarkerInline [html] [clean=false] [<strong><em>bold + italic</em></strong>]
 endParagraph
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml/1.0
+.expect|html/5.0
 .#-----------------------------------------------------
 <p><em>italic</em> and <strong><em>bold + italic</em></strong></p>

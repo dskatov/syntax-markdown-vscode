@@ -70,7 +70,13 @@ public class TextNodeVisitor extends AbstractNodeVisitor
             }
 
             if (isEscaped(value, open)) {
-                emitPlain(value.substring(index, open + 1));
+                if (open - 1 >= index) {
+                    String segment = value.substring(index, open - 1);
+                    if (!segment.isEmpty()) {
+                        emitPlain(segment);
+                    }
+                }
+                emitPlain("$");
                 index = open + 1;
                 continue;
             }

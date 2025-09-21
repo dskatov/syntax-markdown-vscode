@@ -37,13 +37,13 @@ onSpace
 beginMacroMarkerInline [html] [clean=false] [<span
 class="red">good</span>]
 onRawText [<span
-class="red">good</span>] [xhtml/1.0]
+class="red">good</span>] [html/5.0]
 endMacroMarkerInline [html] [clean=false] [<span
 class="red">good</span>]
 endParagraph
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml/1.0
+.expect|html/5.0
 .#-----------------------------------------------------
 <p>XHTML is more &lt; strong &gt;strict&lt; /strong&gt; and this is <span
 class="red">good</span></p>

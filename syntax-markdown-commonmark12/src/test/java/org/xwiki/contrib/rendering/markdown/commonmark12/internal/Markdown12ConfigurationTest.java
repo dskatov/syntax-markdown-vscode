@@ -24,6 +24,9 @@ import java.util.Arrays;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.contrib.rendering.markdown.commonmark12.internal.renderer.Markdown12BlockRenderer;
+import org.xwiki.contrib.rendering.markdown.commonmark12.internal.renderer.Markdown12BlockRendererCompat;
+import org.xwiki.contrib.rendering.markdown.commonmark12.internal.renderer.Markdown12RendererCompat;
+import org.xwiki.contrib.rendering.markdown.commonmark12.internal.renderer.Markdown12RendererFactoryCompat;
 import org.xwiki.contrib.rendering.markdown.commonmark12.internal.renderer.Markdown12ImageReferenceSerializer;
 import org.xwiki.contrib.rendering.markdown.commonmark12.internal.renderer.Markdown12LinkReferenceSerializer;
 import org.xwiki.contrib.rendering.markdown.commonmark12.internal.renderer.Markdown12Renderer;
@@ -33,9 +36,11 @@ import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.renderer.xwiki20.reference.XWiki20ResourceReferenceTypeSerializer;
+import org.xwiki.rendering.internal.listener.ListenerRegistry;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.syntax.SyntaxRegistry;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
@@ -51,14 +56,17 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 8.4
  */
-@ComponentList({
-    Markdown12RendererFactory.class,
-    Markdown12BlockRenderer.class,
-    Markdown12Renderer.class,
-    Markdown12LinkReferenceSerializer.class,
-    Markdown12ImageReferenceSerializer.class,
-    XWiki20ResourceReferenceTypeSerializer.class
-})
+    @ComponentList({
+        Markdown12RendererFactory.class,
+        Markdown12RendererFactoryCompat.class,
+        Markdown12BlockRenderer.class,
+        Markdown12BlockRendererCompat.class,
+        Markdown12Renderer.class,
+        Markdown12RendererCompat.class,
+        Markdown12LinkReferenceSerializer.class,
+        Markdown12ImageReferenceSerializer.class,
+        XWiki20ResourceReferenceTypeSerializer.class
+    })
 public class Markdown12ConfigurationTest
 {
     @Rule
@@ -70,6 +78,8 @@ public class Markdown12ConfigurationTest
         // Simulate an empty configuration
         MarkdownConfiguration configuration = this.mocker.registerMockComponent(MarkdownConfiguration.class);
         when(configuration.getOptions()).thenReturn(new MutableDataSet());
+        this.mocker.registerMockComponent(ListenerRegistry.class);
+        this.mocker.registerMockComponent(SyntaxRegistry.class);
     }
 
     @Test
@@ -85,3 +95,5 @@ public class Markdown12ConfigurationTest
         assertEquals("<del>hello</del>", printer.toString());
     }
 }
+
+

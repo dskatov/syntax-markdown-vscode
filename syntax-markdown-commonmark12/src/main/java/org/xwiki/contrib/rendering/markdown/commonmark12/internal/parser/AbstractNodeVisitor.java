@@ -136,9 +136,11 @@ public abstract class AbstractNodeVisitor
     protected void parseInline(String text)
     {
         try {
+            MathInlineListener mathListener = new MathInlineListener(getListener());
             WrappingListener inlineListener = new InlineFilterListener();
-            inlineListener.setWrappedListener(getListener());
+            inlineListener.setWrappedListener(mathListener);
             this.plainTextStreamParser.parse(new StringReader(text), inlineListener);
+            mathListener.flush();
         } catch (ParseException e) {
             throw new RuntimeException(String.format("Error parsing content [%s]", text), e);
         }
@@ -150,5 +152,64 @@ public abstract class AbstractNodeVisitor
         // We don't clean the HTML since it's possible to intermix MD syntax with HTML and thus has not well-formed
         // HTML content.
         getListener().onMacro("html", Collections.singletonMap("clean", "false"), html, inline);
+    }
+
+
+    private static final class MathInlineListener extends WrappingListener
+    {
+        private final StringBuilder buffer = new StringBuilder();
+
+        MathInlineListener(Listener listener)
+        {
+            setWrappedListener(listener);
+        }
+
+        void flush()
+        {
+            if (this.buffer.length() > 0) {
+                getWrappedListener().onWord(this.buffer.toString());
+                this.buffer.setLength(0);
+            }
+        }
+
+        @Override
+        public void onWord(String word)
+        {
+            if (!word.isEmpty()) {
+                this.buffer.append(word);
+            }
+        }
+
+        @Override
+        public void onSpecialSymbol(char symbol)
+        {
+            if (symbol == '~' || symbol == '^') {
+                this.buffer.append(symbol);
+            } else {
+                flush();
+                getWrappedListener().onSpecialSymbol(symbol);
+            }
+        }
+
+        @Override
+        public void onSpace()
+        {
+            flush();
+            getWrappedListener().onSpace();
+        }
+
+        @Override
+        public void onNewLine()
+        {
+            flush();
+            getWrappedListener().onNewLine();
+        }
+
+        @Override
+        public void onMacro(String id, Map<String, String> parameters, String content, boolean inline)
+        {
+            flush();
+            getWrappedListener().onMacro(id, parameters, content, inline);
+        }
     }
 }

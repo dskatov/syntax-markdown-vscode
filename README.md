@@ -173,3 +173,10 @@ This document captures the end-to-end work done to add LaTeX math to XWiki's Mar
 - Restart only XWiki web container: `docker compose restart web`
 - Recreate web container (clean deploy): `docker compose up -d --force-recreate web`
 - Tail logs: `docker logs -f --tail=300 xwiki-postgres-tomcat-web`
+## Development Status (September 2025)
+
+- Added compatibility renderer components for the legacy `markdown/1.2` hint so the math-aware stack can be reused.
+- Test fixtures under `src/test/resources/markdown12/specific` now target `markdown-math/1.0` and include the sample math page.
+- `mvn -pl syntax-markdown-commonmark12 -am test -DskipITs` still fails: math expectations in `markdown12/specific/math.test` and related subscript/superscript cases are not satisfied yet, and configuration tests lack real plain renderer bindings.
+
+

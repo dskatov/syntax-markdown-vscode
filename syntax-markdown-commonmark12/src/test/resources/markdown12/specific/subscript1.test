@@ -1,5 +1,5 @@
 .#-----------------------------------------------------
-.inputexpect|markdown/1.2
+.input|markdown-math/1.0
 .# Test subscript without spaces around
 .#-----------------------------------------------------
 H~2~O is a liquid.
@@ -19,6 +19,6 @@ onSpecialSymbol [.]
 endParagraph
 endDocument
 .#-----------------------------------------------------
-.expect|markdown/1.2
+.expect|markdown-math/1.0
 .#-----------------------------------------------------
 H~2~O is a liquid.

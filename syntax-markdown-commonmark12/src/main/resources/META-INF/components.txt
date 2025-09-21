@@ -10,3 +10,6 @@ org.xwiki.contrib.rendering.markdown.commonmark12.internal.renderer.Markdown12Re
 org.xwiki.contrib.rendering.markdown.commonmark12.internal.renderer.Markdown12ImageReferenceSerializer
 org.xwiki.contrib.rendering.markdown.commonmark12.internal.renderer.Markdown12LinkReferenceSerializer
 org.xwiki.contrib.rendering.markdown.commonmark12.internal.CommonMark12SyntaxProvider
+org.xwiki.contrib.rendering.markdown.commonmark12.internal.renderer.Markdown12BlockRendererCompat
+org.xwiki.contrib.rendering.markdown.commonmark12.internal.renderer.Markdown12RendererCompat
+org.xwiki.contrib.rendering.markdown.commonmark12.internal.renderer.Markdown12RendererFactoryCompat

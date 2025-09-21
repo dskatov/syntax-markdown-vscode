@@ -1,5 +1,5 @@
 .#-----------------------------------------------------
-.input|markdown/1.2
+.input|markdown-math/1.0
 .# Test proper pair matching of macro
 .#-----------------------------------------------------
 {{mymacro par1="val1" par2=2}}

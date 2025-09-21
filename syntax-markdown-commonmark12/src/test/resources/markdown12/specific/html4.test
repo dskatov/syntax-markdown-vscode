@@ -1,6 +1,6 @@
 .runTransformations
 .#-----------------------------------------------------
-.inputexpect|markdown/1.2
+.input|markdown-math/1.0
 .# Test inline closing and self-closing XHTML tags
 .#-----------------------------------------------------
 hello<br/>closing tags are parsed on their own</a> and <em>non closed run until the end of

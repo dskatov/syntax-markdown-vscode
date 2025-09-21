@@ -14,7 +14,7 @@ onMacroInline [html] [clean=false] [<strong>bold and *not italic*</strong>]
 endParagraph
 endDocument
 .#-----------------------------------------------------
-.expect|markdown/1.2
+.expect|markdown-math/1.0
 .#-----------------------------------------------------
 Hello <strong>bold and \*not italic\*</strong>
 .#-----------------------------------------------------

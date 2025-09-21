@@ -1,5 +1,5 @@
 .#-----------------------------------------------------
-.input|markdown/1.2
+.input|markdown-math/1.0
 .# Fenced code blocks inside list items
 .#-----------------------------------------------------
 * bbb
@@ -13,7 +13,7 @@
 
         code4
 .#-----------------------------------------------------
-.expect|markdown/1.2
+.expect|markdown-math/1.0
 .# Not the same as the input since some parts are
 .# normalized.
 .#-----------------------------------------------------

@@ -1,5 +1,5 @@
 .#-----------------------------------------------------
-.inputexpect|markdown/1.2
+.input|markdown-math/1.0
 .# Make sure special characters are properly handled
 .#-----------------------------------------------------
 '&

@@ -1,5 +1,5 @@
 .#-----------------------------------------------------------------------------
-.input|markdown/1.2
+.input|markdown-math/1.0
 .# Verify link escapes
 .#-----------------------------------------------------------------------------
 [label](<foo\<bar\>>)  
@@ -24,7 +24,7 @@ endLink [Typed = [false] Type = [url] Reference = [https://en.wikipedia.org/Some
 endParagraph
 endDocument
 .#-----------------------------------------------------------------------------
-.expect|markdown/1.2
+.expect|markdown-math/1.0
 .#-----------------------------------------------------------------------------
 [label](foo<bar>)  
 [label](https://en.wikipedia.org/Some_Subject_\(With_Title\))  

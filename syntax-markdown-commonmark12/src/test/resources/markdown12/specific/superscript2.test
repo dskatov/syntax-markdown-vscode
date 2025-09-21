@@ -1,5 +1,5 @@
 .#-----------------------------------------------------
-.inputexpect|markdown/1.2
+.input|markdown-math/1.0
 .# Test superscript with spaces inside
 .#-----------------------------------------------------
 This is ^superscript with spaces^.
@@ -21,6 +21,6 @@ onSpecialSymbol [.]
 endParagraph
 endDocument
 .#-----------------------------------------------------
-.expect|markdown/1.2
+.expect|markdown-math/1.0
 .#-----------------------------------------------------
 This is ^superscript with spaces^.

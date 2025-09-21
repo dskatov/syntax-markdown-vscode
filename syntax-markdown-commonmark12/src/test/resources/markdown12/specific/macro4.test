@@ -1,5 +1,5 @@
 .#-----------------------------------------------------
-.input|markdown/1.2
+.input|markdown-math/1.0
 .# Test macro with parameters, self-closed
 .#-----------------------------------------------------
 {{mymacro par1=val1 par2="val 2" /}}
@@ -10,6 +10,6 @@ beginDocument
 onMacroStandalone [mymacro] [par1=val1|par2=val 2]
 endDocument
 .#-----------------------------------------------------
-.expect|markdown/1.2
+.expect|markdown-math/1.0
 .#-----------------------------------------------------
 {{mymacro par1="val1" par2="val 2"/}}

@@ -185,9 +185,9 @@ public class ParagraphNodeVisitor extends AbstractNodeVisitor
      */
     private boolean emitEmbeddedBlockMath(Paragraph node)
     {
+        List<Object> segments = new ArrayList<>();
+        StringBuilder plainAccumulator = new StringBuilder();
         boolean foundBlock = false;
-        StringBuilder buffer = new StringBuilder();
-        boolean paragraphOpen = false;
 
         for (Node child = node.getFirstChild(); child != null; child = child.getNext()) {
             if (child instanceof Text) {
@@ -196,63 +196,92 @@ public class ParagraphNodeVisitor extends AbstractNodeVisitor
                 while (index < value.length()) {
                     int open = value.indexOf("$$", index);
                     if (open == -1) {
-                        buffer.append(value.substring(index));
+                        plainAccumulator.append(value.substring(index));
                         break;
                     }
 
                     int close = findClosingDoubleDollar(value, open + 2);
                     if (close == -1) {
-                        buffer.append(value.substring(index));
+                        plainAccumulator.append(value.substring(index));
                         break;
                     }
 
-                    buffer.append(value, index, open);
-                    paragraphOpen = flushBuffer(buffer, paragraphOpen);
-
+                    plainAccumulator.append(value, index, open);
                     String content = value.substring(open + 2, close);
                     String stripped = stripEnclosingLineBreaks(content);
                     if (stripped.trim().isEmpty()) {
-                        buffer.append(value, open, close + 2);
+                        plainAccumulator.append(value, open, close + 2);
                     } else {
-                        paragraphOpen = closeParagraph(paragraphOpen);
-                        emitBlockMacro(stripped);
+                        addPlainSegment(segments, plainAccumulator);
+                        segments.add(new BlockMathSegment(stripped));
                         foundBlock = true;
                     }
 
                     index = close + 2;
                 }
             } else if (child instanceof SoftLineBreak) {
-                buffer.append(' ');
+                plainAccumulator.append(' ');
             } else if (child instanceof HardLineBreak) {
-                paragraphOpen = flushBuffer(buffer, paragraphOpen);
-                paragraphOpen = ensureParagraph(paragraphOpen);
-                getListener().onNewLine();
+                plainAccumulator.append("\n");
             } else {
-                paragraphOpen = flushBuffer(buffer, paragraphOpen);
-                paragraphOpen = ensureParagraph(paragraphOpen);
-                getVisitor().visit(child);
+                addPlainSegment(segments, plainAccumulator);
+                segments.add(child);
             }
         }
 
-        paragraphOpen = flushBuffer(buffer, paragraphOpen);
-        closeParagraph(paragraphOpen);
+        addPlainSegment(segments, plainAccumulator);
 
-        return foundBlock;
+        if (!foundBlock) {
+            return false;
+        }
+
+        boolean paragraphOpen = false;
+        for (Object segment : segments) {
+            if (segment instanceof String) {
+                String textSegment = (String) segment;
+                if (!textSegment.isEmpty()) {
+                    paragraphOpen = ensureParagraph(paragraphOpen);
+                    parseInline(textSegment);
+                }
+            } else if (segment instanceof BlockMathSegment) {
+                paragraphOpen = closeParagraph(paragraphOpen);
+                emitBlockMacro(((BlockMathSegment) segment).getContent());
+            } else if (segment instanceof Node) {
+                paragraphOpen = ensureParagraph(paragraphOpen);
+                getVisitor().visit((Node) segment);
+            }
+        }
+
+        closeParagraph(paragraphOpen);
+        return true;
+    }
+
+    private void addPlainSegment(List<Object> segments, StringBuilder accumulator)
+    {
+        if (accumulator.length() > 0) {
+            segments.add(accumulator.toString());
+            accumulator.setLength(0);
+        }
+    }
+
+    private static class BlockMathSegment
+    {
+        private final String content;
+
+        BlockMathSegment(String content)
+        {
+            this.content = content;
+        }
+
+        String getContent()
+        {
+            return this.content;
+        }
     }
 
     private int findClosingDoubleDollar(String text, int searchStart)
     {
         return text.indexOf("$$", searchStart);
-    }
-
-    private boolean flushBuffer(StringBuilder buffer, boolean paragraphOpen)
-    {
-        if (buffer.length() > 0) {
-            paragraphOpen = ensureParagraph(paragraphOpen);
-            parseInline(buffer.toString());
-            buffer.setLength(0);
-        }
-        return paragraphOpen;
     }
 
     private boolean ensureParagraph(boolean paragraphOpen)

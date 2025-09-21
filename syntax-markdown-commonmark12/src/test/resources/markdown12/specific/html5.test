@@ -1,11 +1,11 @@
 .runTransformations
 .#-----------------------------------------------------
-.input|markdown/1.2
+.input|markdown-math/1.0
 .# Test inline HTML with embedded markdown
 .#-----------------------------------------------------
 _italic_ and <strong>_bold + italic_</strong>
 .#-----------------------------------------------------
-.expect|markdown/1.2
+.expect|markdown-math/1.0
 .#-----------------------------------------------------
 _italic_ and <strong><em>bold + italic</em></strong>
 .#-----------------------------------------------------

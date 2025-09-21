@@ -1,5 +1,5 @@
 .#-----------------------------------------------------
-.inputexpect|markdown/1.2
+.input|markdown-math/1.0
 .# Test inline macro without parameters and content
 .#-----------------------------------------------------
 This is inline {{mymacro/}}, look at it!

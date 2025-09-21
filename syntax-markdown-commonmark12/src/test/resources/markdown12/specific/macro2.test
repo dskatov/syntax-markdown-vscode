@@ -1,5 +1,5 @@
 .#-----------------------------------------------------
-.input|markdown/1.2
+.input|markdown-math/1.0
 .# Test macro without parameters and content
 .#-----------------------------------------------------
 {{mymacro}}{{/mymacro}}
@@ -10,6 +10,6 @@ beginDocument
 onMacroStandalone [mymacro] []
 endDocument
 .#-----------------------------------------------------
-.expect|markdown/1.2
+.expect|markdown-math/1.0
 .#-----------------------------------------------------
 {{mymacro/}}

@@ -1,5 +1,5 @@
 .#-----------------------------------------------------------------------------
-.inputexpect|markdown/1.2
+.input|markdown-math/1.0
 .# Verify anchor + query string parameters in wikilinks
 .#-----------------------------------------------------------------------------
 [[label|reference|queryString="a=b&c=d" anchor="anchor"]]

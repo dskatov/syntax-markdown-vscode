@@ -1,5 +1,5 @@
 .#-----------------------------------------------------
-.input|markdown/1.2
+.input|markdown-math/1.0
 .# Verify that a space ending a link followed by a
 .# softlinebreak only generates a single space
 .#-----------------------------------------------------
@@ -22,6 +22,6 @@ onWord [line]
 endParagraph
 endDocument
 .#-----------------------------------------------------
-.expect|markdown/1.2
+.expect|markdown-math/1.0
 .#-----------------------------------------------------
 paragraph on the same line

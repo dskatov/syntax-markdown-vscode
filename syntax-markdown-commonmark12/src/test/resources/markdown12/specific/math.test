@@ -1,11 +1,11 @@
 .#-----------------------------------------------------
-.input|markdown/1.2
+.input|markdown-math/1.0
 .# Inline and block math converted to math macros
 .#-----------------------------------------------------
 An inline math  = mc^2$ lives here.
 
 
-\sum_{n=1}^\infty \frac{1}{n^2} = \frac{\pi^2}{6}
+\sum_{n=1}^{\infty} \frac{1}{n^2} = \frac{\pi^2}{6}
 
 
 Escaped dollar \$ should stay.
@@ -28,7 +28,7 @@ onWord [here]
 onSpecialSymbol [.]
 endParagraph
 onMacroStandalone [mathjax] [] [\\[
-\\sum_{n=1}^\\infty \\frac{1}{n^2} = \\frac{\\pi^2}{6}
+\\sum_{n=1}^{\\infty} \\frac{1}{n^2} = \\frac{\\pi^2}{6}
 \\]]
 beginParagraph
 onWord [Escaped]
@@ -44,13 +44,13 @@ onSpecialSymbol [.]
 endParagraph
 endDocument
 .#-----------------------------------------------------
-.expect|markdown/1.2
+.expect|markdown-math/1.0
 .#-----------------------------------------------------
 An inline math {{mathjax}}\\(E = mc^2\\){{/mathjax}} lives here.
 
 {{mathjax}}
 \\[
-\\sum_{n=1}^\\infty \\frac{1}{n^2} = \\frac{\\pi^2}{6}
+\\sum_{n=1}^{\\infty} \\frac{1}{n^2} = \\frac{\\pi^2}{6}
 \\]
 {{/mathjax}}
 

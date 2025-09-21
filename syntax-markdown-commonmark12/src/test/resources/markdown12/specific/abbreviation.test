@@ -1,6 +1,6 @@
 .runTransformations
 .#-----------------------------------------------------
-.input|markdown/1.2
+.input|markdown-math/1.0
 .# Test abbreviations
 .#-----------------------------------------------------
 The HTML specification is maintained by the W3C.
@@ -35,7 +35,7 @@ onSpecialSymbol [.]
 endParagraph
 endDocument
 .#-----------------------------------------------------
-.expect|markdown/1.2
+.expect|markdown-math/1.0
 .#-----------------------------------------------------
 The HTML specification is maintained by the W3C.
 

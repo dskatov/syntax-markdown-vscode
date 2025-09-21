@@ -1,5 +1,5 @@
 .#-----------------------------------------------------
-.input|markdown/1.2
+.input|markdown-math/1.0
 .# Test inline code using alternate syntax
 .#-----------------------------------------------------
 This is ``some code``
@@ -16,6 +16,6 @@ onMacroInline [code] [language=none] [some code]
 endParagraph
 endDocument
 .#-----------------------------------------------------
-.expect|markdown/1.2
+.expect|markdown-math/1.0
 .#-----------------------------------------------------
 This is `some code`

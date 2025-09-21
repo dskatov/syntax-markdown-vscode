@@ -1,5 +1,5 @@
 .#-----------------------------------------------------
-.input|markdown/1.2
+.input|markdown-math/1.0
 .# Test inline macro without parameters
 .#-----------------------------------------------------
 This is inline {{mymacro}}Macro content here{{/mymacro}}.
@@ -19,6 +19,6 @@ onSpecialSymbol [.]
 endParagraph
 endDocument
 .#-----------------------------------------------------
-.expect|markdown/1.2
+.expect|markdown-math/1.0
 .#-----------------------------------------------------
 This is inline {{mymacro}}Macro content here{{/mymacro}}.

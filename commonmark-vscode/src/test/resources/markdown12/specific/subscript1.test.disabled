@@ -1,0 +1,24 @@
+.#-----------------------------------------------------
+.input|commonmark-vscode/0.1
+.# Test subscript without spaces around
+.#-----------------------------------------------------
+H~2~O is a liquid.
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+onWord [H~2~O]
+onSpace
+onWord [is]
+onSpace
+onWord [a]
+onSpace
+onWord [liquid]
+onSpecialSymbol [.]
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.expect|commonmark-vscode/0.1
+.#-----------------------------------------------------
+H~2~O is a liquid.

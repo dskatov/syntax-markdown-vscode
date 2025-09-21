@@ -1,0 +1,41 @@
+.#-----------------------------------------------------
+.input|commonmark-vscode/0.1
+.# Test table captions
+.#-----------------------------------------------------
+col1   |col2    |
+-------|--------|
+cell11 | cell12 |
+cell21 | cell22 |
+[caption]
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginTable
+beginTableRow
+beginTableHeadCell
+onWord [col1]
+endTableHeadCell
+beginTableHeadCell
+onWord [col2]
+endTableHeadCell
+endTableRow
+beginTableRow
+beginTableCell
+onWord [cell11]
+endTableCell
+beginTableCell
+onWord [cell12]
+endTableCell
+endTableRow
+beginTableRow
+beginTableCell
+onWord [cell21]
+endTableCell
+beginTableCell
+onWord [cell22]
+endTableCell
+endTableRow
+onMacroStandalone [html] [clean=false] [<caption>caption</caption>]
+endTable
+endDocument

@@ -1,0 +1,27 @@
+.#-----------------------------------------------------
+.input|commonmark-vscode/0.1
+.# Test table alignemnt
+.#-----------------------------------------------------
+:-----|-----:|----|:---:
+Cool  | Shit | in | here
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginTable
+beginTableRow
+beginTableCell [[align]=[left]]
+onWord [Cool]
+endTableCell [[align]=[left]]
+beginTableCell [[align]=[right]]
+onWord [Shit]
+endTableCell [[align]=[right]]
+beginTableCell
+onWord [in]
+endTableCell
+beginTableCell [[align]=[center]]
+onWord [here]
+endTableCell [[align]=[center]]
+endTableRow
+endTable
+endDocument

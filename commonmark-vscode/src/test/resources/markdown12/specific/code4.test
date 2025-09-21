@@ -1,0 +1,21 @@
+.#-----------------------------------------------------
+.input|commonmark-vscode/0.1
+.# Test inline code using alternate syntax
+.#-----------------------------------------------------
+This is ``some code``
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+onWord [This]
+onSpace
+onWord [is]
+onSpace
+onMacroInline [code] [language=none] [some code]
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.expect|commonmark-vscode/0.1
+.#-----------------------------------------------------
+This is `some code`

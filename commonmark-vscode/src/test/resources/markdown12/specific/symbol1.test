@@ -1,0 +1,28 @@
+.runTransformations
+.#-----------------------------------------------------
+.input|commonmark-vscode/0.1
+.# Markdown supports entering HTML entities
+.#-----------------------------------------------------
+Some html entities &amp; and &#60;
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+onWord [Some]
+onSpace
+onWord [html]
+onSpace
+onWord [entities]
+onSpace
+beginMacroMarkerInline [html] [clean=false] [&amp;]
+onRawText [&amp;] [html/5.0]
+endMacroMarkerInline [html] [clean=false] [&amp;]
+onSpace
+onWord [and]
+onSpace
+beginMacroMarkerInline [html] [clean=false] [&#60;]
+onRawText [&#60;] [html/5.0]
+endMacroMarkerInline [html] [clean=false] [&#60;]
+endParagraph
+endDocument

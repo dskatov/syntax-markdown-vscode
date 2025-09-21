@@ -1,0 +1,40 @@
+.runTransformations
+.#-----------------------------------------------------
+.input|commonmark-vscode/0.1
+.# Test block HTML
+.#-----------------------------------------------------
+hello
+
+<table>
+  <tr>
+    <td>Foo</td>
+  </tr>
+</table>
+
+world
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+onWord [hello]
+endParagraph
+beginMacroMarkerStandalone [html] [clean=false] [<table>
+  <tr>
+    <td>Foo</td>
+  </tr>
+</table>]
+onRawText [<table>
+  <tr>
+    <td>Foo</td>
+  </tr>
+</table>] [html/5.0]
+endMacroMarkerStandalone [html] [clean=false] [<table>
+  <tr>
+    <td>Foo</td>
+  </tr>
+</table>]
+beginParagraph
+onWord [world]
+endParagraph
+endDocument

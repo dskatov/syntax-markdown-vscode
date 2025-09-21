@@ -1,0 +1,22 @@
+.#-----------------------------------------------------
+.input|commonmark-vscode/0.1
+.# Test superscript without spaces around
+.#-----------------------------------------------------
+2^10^ is 1024.
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+onWord [2^10^]
+onSpace
+onWord [is]
+onSpace
+onWord [1024]
+onSpecialSymbol [.]
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.expect|commonmark-vscode/0.1
+.#-----------------------------------------------------
+2^10^ is 1024.

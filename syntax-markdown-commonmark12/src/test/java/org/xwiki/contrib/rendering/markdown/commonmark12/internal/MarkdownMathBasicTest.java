@@ -82,6 +82,34 @@ public class MarkdownMathBasicTest
     }
 
     @Test
+    public void blockMathWithOperatorNameAndInlineContext() throws Exception
+    {
+        registerMinimalMocks();
+
+        Parser parser = this.mocker.getInstance(Parser.class, "markdown-math/1.0");
+        String expression = "\\varsigma^\\text{proto}_k = \\operatorname{spin}\\left(\\{q_{u} - q_{u-1}\\}_{u=k-h}^{k}\\right)";
+        String sample = String.join("\n",
+                "For each signal start index $s$, compute a proto-voltage using the prior window of neutral steps:",
+                "$$",
+                expression,
+                "$$",
+                "This uses a right-aligned slice ending at $k$.");
+
+        XDOM xdom = parser.parse(new StringReader(sample));
+
+        List<MacroBlock> macros = findMathMacros(xdom);
+        List<MacroBlock> blockMacros = new ArrayList<>();
+        for (MacroBlock macro : macros) {
+            if (!macro.isInline()) {
+                blockMacros.add(macro);
+            }
+        }
+
+        assertEquals("Expected a block math macro for the $$ expression", 1, blockMacros.size());
+        assertEquals(blockMath(expression), blockMacros.get(0).getContent());
+    }
+
+    @Test
     public void mathInsideListItemsIsDetected() throws Exception
     {
         registerMinimalMocks();

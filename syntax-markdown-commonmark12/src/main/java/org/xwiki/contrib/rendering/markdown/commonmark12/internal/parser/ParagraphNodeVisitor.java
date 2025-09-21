@@ -187,6 +187,7 @@ public class ParagraphNodeVisitor extends AbstractNodeVisitor
     {
         List<Object> segments = new ArrayList<>();
         StringBuilder plainAccumulator = new StringBuilder();
+        StringBuilder mathAccumulator = null;
         boolean foundBlock = false;
 
         for (Node child = node.getFirstChild(); child != null; child = child.getNext()) {
@@ -194,39 +195,78 @@ public class ParagraphNodeVisitor extends AbstractNodeVisitor
                 String value = child.getChars().toString();
                 int index = 0;
                 while (index < value.length()) {
+                    if (mathAccumulator != null) {
+                        int close = findClosingDoubleDollar(value, index);
+                        if (close == -1) {
+                            mathAccumulator.append(value.substring(index));
+                            break;
+                        }
+
+                        mathAccumulator.append(value, index, close);
+                        String stripped = stripEnclosingLineBreaks(mathAccumulator.toString());
+                        if (stripped.trim().isEmpty()) {
+                            plainAccumulator.append("$$").append(mathAccumulator).append("$$");
+                        } else {
+                            addPlainSegment(segments, plainAccumulator);
+                            segments.add(new BlockMathSegment(stripped));
+                            foundBlock = true;
+                        }
+
+                        mathAccumulator = null;
+                        index = close + 2;
+                        continue;
+                    }
+
                     int open = value.indexOf("$$", index);
                     if (open == -1) {
                         plainAccumulator.append(value.substring(index));
                         break;
                     }
 
-                    int close = findClosingDoubleDollar(value, open + 2);
-                    if (close == -1) {
-                        plainAccumulator.append(value.substring(index));
-                        break;
-                    }
-
                     plainAccumulator.append(value, index, open);
-                    String content = value.substring(open + 2, close);
-                    String stripped = stripEnclosingLineBreaks(content);
-                    if (stripped.trim().isEmpty()) {
-                        plainAccumulator.append(value, open, close + 2);
-                    } else {
-                        addPlainSegment(segments, plainAccumulator);
-                        segments.add(new BlockMathSegment(stripped));
-                        foundBlock = true;
-                    }
 
-                    index = close + 2;
+                    int close = findClosingDoubleDollar(value, open + 2);
+                    if (close != -1) {
+                        String content = value.substring(open + 2, close);
+                        String stripped = stripEnclosingLineBreaks(content);
+                        if (stripped.trim().isEmpty()) {
+                            plainAccumulator.append(value, open, close + 2);
+                        } else {
+                            addPlainSegment(segments, plainAccumulator);
+                            segments.add(new BlockMathSegment(stripped));
+                            foundBlock = true;
+                        }
+                        index = close + 2;
+                    } else {
+                        mathAccumulator = new StringBuilder();
+                        mathAccumulator.append(value.substring(open + 2));
+                        index = value.length();
+                    }
                 }
             } else if (child instanceof SoftLineBreak) {
-                plainAccumulator.append(' ');
+                if (mathAccumulator != null) {
+                    mathAccumulator.append('\n');
+                } else {
+                    plainAccumulator.append(' ');
+                }
             } else if (child instanceof HardLineBreak) {
-                plainAccumulator.append("\n");
+                if (mathAccumulator != null) {
+                    mathAccumulator.append('\n');
+                } else {
+                    plainAccumulator.append("\n");
+                }
             } else {
+                if (mathAccumulator != null) {
+                    mathAccumulator.append(child.getChars().toString());
+                    continue;
+                }
                 addPlainSegment(segments, plainAccumulator);
                 segments.add(child);
             }
+        }
+
+        if (mathAccumulator != null) {
+            plainAccumulator.append("$$").append(mathAccumulator);
         }
 
         addPlainSegment(segments, plainAccumulator);

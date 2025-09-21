@@ -175,6 +175,10 @@ This document captures the end-to-end work done to add LaTeX math to XWiki's Mar
 - Tail logs: `docker logs -f --tail=300 xwiki-postgres-tomcat-web`
 ## Development Status (September 2025)
 
+- Solidified block math detection when Flexmark splits LaTeX nodes: the paragraph visitor now keeps a `mathAccumulator` once it sees `$$`, appending text, soft/hard breaks, and other inline nodes' source slices until the matching delimiter appears. This allows formulas like `\\varsigma^\\text{proto}_k = \\operatorname{spin}\\left(\\{q_{u} - q_{u-1}\\}_{u=k-h}^{k}\\right)` to survive inline emphasis or operator names without being dropped.
+  - Follow-up: retest other inline containers (links/images) inside $$ once broader regression fixtures are added; we currently rely on Flexmark's `getChars()` output, so nodes that synthesise content (e.g., images without textual alt) would need extra handling.
+
+
 - Updated the inline visitor pipeline so ~ and ^ stay attached to surrounding words outside of math while preserving the LaTeX content inside $...$/$$... macros.
 - Brought back the Markdown 1.2 compatibility renderer and plain parser stubs for the configuration/newline unit tests; they now run against the math-aware stack without additional wiring.
 - Temporarily disabled subscript*.test and superscript*.test (renamed to .test.disabled) because expectations still assume literal parsing; noted this in the fixtures for follow-up.
@@ -186,5 +190,7 @@ This document captures the end-to-end work done to add LaTeX math to XWiki's Mar
   * Root cause: we previously fed prose back through `parseInline`, which replayed the same buffer twice and starved the inline visitor; that duplicated paragraph content and left `$...$` spans untreated. Now we wrap the plain slice in a flexmark `Text` node so the regular visitor path sees it exactly once and converts inline math as expected.
 - Test fixtures under `src/test/resources/markdown12/specific` now target `markdown-math/1.0` and include the sample math page.
 - `mvn -pl syntax-markdown-commonmark12 -am test -DskipITs` still fails: `markdown12/specific/math.test` and the subscript/superscript fixtures disagree on escaped dollars and `~`/`^` handling, and the configuration tests still lack realistic plain renderer/stream parser bindings.
+
+
 
 

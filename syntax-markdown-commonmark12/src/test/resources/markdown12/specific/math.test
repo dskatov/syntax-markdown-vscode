@@ -2,11 +2,11 @@
 .input|markdown-math/1.0
 .# Inline and block math converted to math macros
 .#-----------------------------------------------------
-An inline math  = mc^2$ lives here.
+An inline math $E = mc^2$ lives here.
 
-
+$$
 \sum_{n=1}^{\infty} \frac{1}{n^2} = \frac{\pi^2}{6}
-
+$$
 
 Escaped dollar \$ should stay.
 .#-----------------------------------------------------
@@ -20,22 +20,23 @@ onWord [inline]
 onSpace
 onWord [math]
 onSpace
-onMacroInline [mathjax] [] [\\(E = mc^2\\)]
+onMacroInline [mathjax] [] [\(E = mc^2\)]
 onSpace
 onWord [lives]
 onSpace
 onWord [here]
 onSpecialSymbol [.]
 endParagraph
-onMacroStandalone [mathjax] [] [\\[
-\\sum_{n=1}^{\\infty} \\frac{1}{n^2} = \\frac{\\pi^2}{6}
-\\]]
+onMacroStandalone [mathjax] [] [\[
+\sum_{n=1}^{\infty} \frac{1}{n^2} = \frac{\pi^2}{6}
+\]]
 beginParagraph
 onWord [Escaped]
 onSpace
 onWord [dollar]
 onSpace
-onWord [$]
+onWord [\]
+onSpecialSymbol [$]
 onSpace
 onWord [should]
 onSpace
@@ -46,12 +47,12 @@ endDocument
 .#-----------------------------------------------------
 .expect|markdown-math/1.0
 .#-----------------------------------------------------
-An inline math {{mathjax}}\\(E = mc^2\\){{/mathjax}} lives here.
+An inline math {{mathjax}}\(E = mc^2\){{/mathjax}} lives here.
 
 {{mathjax}}
-\\[
-\\sum_{n=1}^{\\infty} \\frac{1}{n^2} = \\frac{\\pi^2}{6}
-\\]
+\[
+\sum_{n=1}^{\infty} \frac{1}{n^2} = \frac{\pi^2}{6}
+\]
 {{/mathjax}}
 
 Escaped dollar $ should stay.

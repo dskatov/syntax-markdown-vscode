@@ -241,7 +241,7 @@ public class ParagraphNodeVisitor extends AbstractNodeVisitor
                 String textSegment = (String) segment;
                 if (!textSegment.isEmpty()) {
                     paragraphOpen = ensureParagraph(paragraphOpen);
-                    parseInline(textSegment);
+                    visitTextSegment(textSegment);
                 }
             } else if (segment instanceof BlockMathSegment) {
                 paragraphOpen = closeParagraph(paragraphOpen);
@@ -254,6 +254,13 @@ public class ParagraphNodeVisitor extends AbstractNodeVisitor
 
         closeParagraph(paragraphOpen);
         return true;
+    }
+
+    private void visitTextSegment(String textSegment)
+    {
+        if (!textSegment.isEmpty()) {
+            getVisitor().visit(new Text(textSegment));
+        }
     }
 
     private void addPlainSegment(List<Object> segments, StringBuilder accumulator)

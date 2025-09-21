@@ -3,32 +3,49 @@
  */
 package org.xwiki.contrib.rendering.markdown.commonmark12.internal;
 
+import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.NewLineBlock;
 import org.xwiki.rendering.block.MacroBlock;
+import org.xwiki.rendering.block.ParagraphBlock;
+import org.xwiki.rendering.block.SpaceBlock;
+import org.xwiki.rendering.block.SpecialSymbolBlock;
+import org.xwiki.rendering.block.WordBlock;
+import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.renderer.PrintRenderer;
+import org.xwiki.rendering.renderer.PrintRendererFactory;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @ComponentList({
-    org.xwiki.contrib.rendering.markdown.commonmark12.internal.parser.Markdown12Parser.class,
-    org.xwiki.contrib.rendering.markdown.commonmark12.internal.parser.Markdown12StreamParser.class,
-    org.xwiki.contrib.rendering.markdown.commonmark12.internal.parser.Markdown12ParserCompat.class,
-    org.xwiki.contrib.rendering.markdown.commonmark12.internal.parser.Markdown12StreamParserCompat.class,
-    org.xwiki.contrib.rendering.markdown.commonmark12.internal.parser.DefaultFlexmarkNodeVisitor.class,
-    org.xwiki.contrib.rendering.markdown.commonmark12.internal.DefaultMarkdownConfiguration.class
+        org.xwiki.contrib.rendering.markdown.commonmark12.internal.parser.Markdown12Parser.class,
+        org.xwiki.contrib.rendering.markdown.commonmark12.internal.parser.Markdown12StreamParser.class,
+        org.xwiki.contrib.rendering.markdown.commonmark12.internal.parser.Markdown12ParserCompat.class,
+        org.xwiki.contrib.rendering.markdown.commonmark12.internal.parser.Markdown12StreamParserCompat.class,
+        org.xwiki.contrib.rendering.markdown.commonmark12.internal.parser.DefaultFlexmarkNodeVisitor.class,
+        org.xwiki.contrib.rendering.markdown.commonmark12.internal.DefaultMarkdownConfiguration.class
 })
 public class MarkdownMathBasicTest
 {
+    private static final char BACKSLASH = '\\';
+
     @Rule
     public MockitoComponentManagerRule mocker = new MockitoComponentManagerRule();
 
@@ -42,7 +59,7 @@ public class MarkdownMathBasicTest
 
         String content = findMacroContent(xdom, true);
         assertNotNull("Inline math macro not found", content);
-        assertEquals("\\(E = mc^2\\)", content);
+        assertEquals(inlineMath("E = mc^2"), content);
     }
 
     @Test
@@ -51,11 +68,17 @@ public class MarkdownMathBasicTest
         registerMinimalMocks();
 
         Parser parser = this.mocker.getInstance(Parser.class, "markdown-math/1.0");
-        XDOM xdom = parser.parse(new StringReader("$$\nA^2 + B^2 = C^2\n$$"));
+        String blockSample = String.join("\n",
+                "$$",
+                "A^2 + B^2 = C^2",
+                "$$",
+                "");
+
+        XDOM xdom = parser.parse(new StringReader(blockSample));
 
         String content = findMacroContent(xdom, false);
         assertNotNull("Block math macro not found", content);
-        assertEquals("\\[\nA^2 + B^2 = C^2\n\\]", content);
+        assertEquals(blockMath("A^2 + B^2 = C^2"), content);
     }
 
     @Test
@@ -64,9 +87,15 @@ public class MarkdownMathBasicTest
         registerMinimalMocks();
 
         Parser parser = this.mocker.getInstance(Parser.class, "markdown-math/1.0");
-        String sample = "Given data of $x$:\n\n- Optimize flow:\n  $$ x^2 + y^2 = z^2 $$\n"
-            + "- Subsidize point:   $$ 4 + 5 = 9 $$\n";
-        XDOM xdom = parser.parse(new StringReader(sample));
+        String listSample = String.join("\n",
+                "Given data of $x$:",
+                "",
+                "- Optimize flow:",
+                "  $$ x^2 + y^2 = z^2 $$",
+                "- Subsidize point:   $$ 4 + 5 = 9 $$",
+                "");
+
+        XDOM xdom = parser.parse(new StringReader(listSample));
 
         List<MacroBlock> macros = findMathMacros(xdom);
         List<MacroBlock> inlineMacros = new ArrayList<>();
@@ -80,17 +109,131 @@ public class MarkdownMathBasicTest
         }
 
         assertEquals("Expected inline math span for $x$", 1, inlineMacros.size());
-        assertEquals("\\(x\\)", inlineMacros.get(0).getContent());
+        assertEquals(inlineMath("x"), inlineMacros.get(0).getContent());
 
         assertEquals("Expected two block math macros", 2, blockMacros.size());
-        assertEquals("\\[\nx^2 + y^2 = z^2\n\\]", blockMacros.get(0).getContent());
-        assertEquals("\\[\n4 + 5 = 9\n\\]", blockMacros.get(1).getContent());
+        assertEquals(blockMath("x^2 + y^2 = z^2"), blockMacros.get(0).getContent());
+        assertEquals(blockMath("4 + 5 = 9"), blockMacros.get(1).getContent());
+    }
+
+    @Test
+    public void complexPageDoesNotDuplicateContent() throws Exception
+    {
+        registerMinimalMocks();
+
+        Parser parser = this.mocker.getInstance(Parser.class, "markdown-math/1.0");
+        String complexSample = String.join("\n",
+                "Click on **\"Edit\"** and modify the contents of this page, then click on **\"Save & View\"** to see how they look like on your page!",
+                "",
+                "# Here's some dummy text to show you what the page looks like",
+                "",
+                "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+                "",
+                "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+                "",
+                "Inline: $ x^{\text{pre}}_t $.",
+                "",
+                "$$",
+                "\\sum_{i=1}^{n} x_i^2",
+                "$$",
+                "",
+                "{{mathjax}}",
+                "\\begin{equation}",
+                "y = \\frac{c}{cb-ad}",
+                "\\end{equation}",
+                "{{/mathjax}}",
+                "",
+                "$K_t = \\tfrac12 v_t^2$",
+                "",
+                "$$",
+                "\\[",
+                "\\begin{equation}",
+                "y = \\frac{c}{cb-ad}",
+                "\\end{equation}",
+                "\\]",
+                "$$",
+                "",
+                "Given data of $x$:",
+                "",
+                "- Optimize flow:",
+                "  $$ x^2 + y^2 = z^2 $$",
+                "- Subsidize point:   $$ 4 + 5 = 9 $$",
+                "");
+
+        XDOM xdom = parser.parse(new StringReader(complexSample));
+
+        List<String> paragraphs = collectParagraphTexts(xdom);
+        long inlineCount = paragraphs.stream().filter(p -> p.contains("Inline:")).count();
+        long givenCount = paragraphs.stream().filter(p -> p.contains("Given data of")).count();
+
+        assertEquals("Inline label duplicated", 1, inlineCount);
+        assertEquals("Given label duplicated", 1, givenCount);
+    }
+
+    private String inlineMath(String body)
+    {
+        return String.valueOf(BACKSLASH) + '(' + body + BACKSLASH + ')';
+    }
+
+    private String blockMath(String body)
+    {
+        return String.valueOf(BACKSLASH) + '[' + '\n' + body + '\n' + BACKSLASH + ']';
+    }
+
+    private void parsePlain(Reader reader, Listener listener) throws IOException
+    {
+        StringBuilder word = new StringBuilder();
+        int value;
+        while ((value = reader.read()) != -1) {
+            char character = (char) value;
+            if (character == '\r') {
+                continue;
+            }
+            if (character == '\n') {
+                flushWord(word, listener);
+                listener.onNewLine();
+            } else if (Character.isWhitespace(character)) {
+                flushWord(word, listener);
+                listener.onSpace();
+            } else {
+                word.append(character);
+            }
+        }
+        flushWord(word, listener);
+    }
+
+    private void flushWord(StringBuilder buffer, Listener listener)
+    {
+        if (buffer.length() > 0) {
+            listener.onWord(buffer.toString());
+            buffer.setLength(0);
+        }
     }
 
     private void registerMinimalMocks() throws Exception
     {
-        this.mocker.registerMockComponent(org.xwiki.rendering.parser.StreamParser.class, "plain/1.0");
-        this.mocker.registerMockComponent(org.xwiki.rendering.renderer.PrintRendererFactory.class, "plain/1.0");
+        org.xwiki.rendering.parser.StreamParser plainStreamParser =
+            this.mocker.registerMockComponent(org.xwiki.rendering.parser.StreamParser.class, "plain/1.0");
+        Mockito.doAnswer(invocation -> {
+            Reader reader = invocation.getArgument(0, Reader.class);
+            Listener listener = invocation.getArgument(1, Listener.class);
+            try {
+                parsePlain(reader, listener);
+            } catch (IOException exception) {
+                throw new RuntimeException("Failed to parse plain text", exception);
+            }
+            return null;
+        }).when(plainStreamParser).parse(Mockito.any(Reader.class), Mockito.any(Listener.class));
+
+        PrintRendererFactory printRendererFactory =
+                this.mocker.registerMockComponent(PrintRendererFactory.class, "plain/1.0");
+        when(printRendererFactory.createRenderer(any(WikiPrinter.class))).thenAnswer(invocation -> {
+            WikiPrinter printer = invocation.getArgument(0, WikiPrinter.class);
+            PrintRenderer renderer = mock(PrintRenderer.class);
+            when(renderer.getPrinter()).thenReturn(printer);
+            return renderer;
+        });
+
         this.mocker.registerMockComponent(org.xwiki.rendering.parser.ResourceReferenceParser.class, "image");
         this.mocker.registerMockComponent(org.xwiki.rendering.parser.ResourceReferenceParser.class, "link");
     }
@@ -150,4 +293,42 @@ public class MarkdownMathBasicTest
         }
         return macros;
     }
+
+    private List<String> collectParagraphTexts(XDOM xdom)
+    {
+        List<String> paragraphs = new ArrayList<>();
+        for (Block block : xdom.getChildren()) {
+            collectParagraphTexts(block, paragraphs);
+        }
+        return paragraphs;
+    }
+
+    private void collectParagraphTexts(Block block, List<String> paragraphs)
+    {
+        if (block instanceof ParagraphBlock) {
+            paragraphs.add(extractText(block));
+        }
+        for (Block child : block.getChildren()) {
+            collectParagraphTexts(child, paragraphs);
+        }
+    }
+
+    private String extractText(Block block)
+    {
+        StringBuilder builder = new StringBuilder();
+        if (block instanceof WordBlock) {
+            builder.append(((WordBlock) block).getWord());
+        } else if (block instanceof SpaceBlock) {
+            builder.append(' ');
+        } else if (block instanceof SpecialSymbolBlock) {
+            builder.append(((SpecialSymbolBlock) block).getSymbol());
+        } else if (block instanceof NewLineBlock) {
+            builder.append('\n');
+        }
+        for (Block child : block.getChildren()) {
+            builder.append(extractText(child));
+        }
+        return builder.toString();
+    }
 }
+

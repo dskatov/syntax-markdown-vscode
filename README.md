@@ -60,7 +60,15 @@ This document captures the end-to-end work done to add LaTeX math to XWiki's Mar
   - `syntax-markdown/syntax-markdown-commonmark12/src/main/java/...` (parsers, visitors, config)
   - `syntax-markdown/syntax-markdown-commonmark12/pom.xml` (dependencies, shading, Java level)
 - Deployable JAR placed at:
-  - `deploy/syntax-markdown-math10-16.5.0-math1.0.jar`
+  - `dist/math-milestone-aurora/syntax-markdown-math10-16.5.0-math1.0.jar`
+
+## Repository Layout (2025-09-21)
+
+- `dist/` keeps shaded jars grouped by milestone tag (see `dist/README.md`).
+- `syntax-markdown-commonmark12/` hosts the CommonMark 1.2 + math module.
+- `syntax-markdown-github10/` remains the GFM 1.0 port (untouched here).
+- `.github/` carries CI workflows and release automation skeletons.
+- `target/` is Maven output (git-ignored).
 
 ## Behavior Details
 
@@ -100,7 +108,7 @@ This document captures the end-to-end work done to add LaTeX math to XWiki's Mar
 ### Deploy in Docker
 
 - Bind mount the JAR (compose excerpt):
-  - `"./deploy/syntax-markdown-math10-16.5.0-math1.0.jar:/usr/local/tomcat/webapps/ROOT/WEB-INF/lib/syntax-markdown-math10-16.5.0-math1.0.jar:ro"`
+  - `"./dist/math-milestone-aurora/syntax-markdown-math10-16.5.0-math1.0.jar:/usr/local/tomcat/webapps/ROOT/WEB-INF/lib/syntax-markdown-math10-16.5.0-math1.0.jar:ro"`
 - Restart only XWiki/Tomcat (no DB):
   - `docker compose restart web`
   - Or recreate for a clean redeploy: `docker compose up -d --force-recreate web`
@@ -152,7 +160,8 @@ This document captures the end-to-end work done to add LaTeX math to XWiki's Mar
 - Pages render again (no 404; no MissingParserException for `markdown/1.2`).
 - New syntax `markdown-math/1.0` available and functioning.
 - Autolink NoClassDefFoundError resolved (autolink shaded).
-- Deployable JAR prepared at `deploy/syntax-markdown-math10-16.5.0-math1.0.jar`.
+- Deployable JAR prepared at `dist/math-milestone-aurora/syntax-markdown-math10-16.5.0-math1.0.jar`.
+
 - Targeted math suite (`MarkdownMathBasicTest`) passing as of 2025-09-21 10:23 CEST; refreshed jar staged at the same path.
 
 ## Notes & Limits

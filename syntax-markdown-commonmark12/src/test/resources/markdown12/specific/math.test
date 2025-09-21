@@ -20,14 +20,16 @@ onWord [inline]
 onSpace
 onWord [math]
 onSpace
-onMacroInline [mathjax] [] [E = mc^2]
+onMacroInline [mathjax] [] [\\(E = mc^2\\)]
 onSpace
 onWord [lives]
 onSpace
 onWord [here]
 onSpecialSymbol [.]
 endParagraph
-onMacroStandalone [mathjax] [] [\sum_{n=1}^\infty \frac{1}{n^2} = \frac{\pi^2}{6}]
+onMacroStandalone [mathjax] [] [\\[
+\\sum_{n=1}^\\infty \\frac{1}{n^2} = \\frac{\\pi^2}{6}
+\\]]
 beginParagraph
 onWord [Escaped]
 onSpace
@@ -44,10 +46,12 @@ endDocument
 .#-----------------------------------------------------
 .expect|markdown/1.2
 .#-----------------------------------------------------
-An inline math {{mathjax}}E = mc^2{{/mathjax}} lives here.
+An inline math {{mathjax}}\\(E = mc^2\\){{/mathjax}} lives here.
 
 {{mathjax}}
-\sum_{n=1}^\infty \frac{1}{n^2} = \frac{\pi^2}{6}
+\\[
+\\sum_{n=1}^\\infty \\frac{1}{n^2} = \\frac{\\pi^2}{6}
+\\]
 {{/mathjax}}
 
 Escaped dollar $ should stay.

@@ -35,8 +35,6 @@
     <xwiki.jacoco.instructionRatio>0.87</xwiki.jacoco.instructionRatio>
     <!-- Compile against XWiki Rendering 16.5.0 (Java 17 baseline) -->
     <rendering.version>16.5.0</rendering.version>
-    <!-- Skip test compilation/execution for this packaging step -->
-    <maven.test.skip>true</maven.test.skip>
     <!-- Disable XWiki parent enforcer rules locally to allow packaging this fork -->
     <xwiki.enforcer.enforce-upper-bounds.skip>true</xwiki.enforcer.enforce-upper-bounds.skip>
     <xwiki.enforcer.check-dependency-version.skip>true</xwiki.enforcer.check-dependency-version.skip>
@@ -109,7 +107,30 @@
       <version>${rendering.version}</version>
       <scope>provided</scope>
     </dependency>
-    <!-- No test dependencies in the packaged module to avoid enforcer upper-bounds issues -->
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-test</artifactId>
+      <version>${rendering.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-syntax-event</artifactId>
+      <version>${rendering.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-syntax-xhtml</artifactId>
+      <version>${rendering.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-macro-html</artifactId>
+      <version>${rendering.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

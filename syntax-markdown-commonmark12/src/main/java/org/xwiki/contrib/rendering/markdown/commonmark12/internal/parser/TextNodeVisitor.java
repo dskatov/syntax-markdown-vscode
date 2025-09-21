@@ -113,8 +113,9 @@ public class TextNodeVisitor extends AbstractNodeVisitor
         if (content.isEmpty()) {
             return;
         }
+        String wrapped = ensureInlineWrapped(content);
         getListener().onMacro(this.configuration.getMathMacroId(),
-            this.configuration.getInlineMathMacroParameters(), content, true);
+            this.configuration.getInlineMathMacroParameters(), wrapped, true);
     }
 
     private int findClosing(String text, int start)
@@ -155,5 +156,21 @@ public class TextNodeVisitor extends AbstractNodeVisitor
     private boolean containsLineBreak(String text)
     {
         return text.indexOf('\n') >= 0 || text.indexOf('\r') >= 0;
+    }
+
+    private String ensureInlineWrapped(String content)
+    {
+        String trimmed = content.trim();
+        if (trimmed.isEmpty()) {
+            return trimmed;
+        }
+
+        if ((trimmed.startsWith("\\(") && trimmed.endsWith("\\)"))
+            || (trimmed.startsWith("\\[") && trimmed.endsWith("\\]")))
+        {
+            return trimmed;
+        }
+
+        return "\\(" + trimmed + "\\)";
     }
 }

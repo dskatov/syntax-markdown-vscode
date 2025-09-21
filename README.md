@@ -178,6 +178,7 @@ This document captures the end-to-end work done to add LaTeX math to XWiki's Mar
 - Reintroduced `MarkdownMathBasicTest` to lock inline `$...$` and block `$$...$$` parsing; run with `mvn -pl syntax-markdown-commonmark12 -Dtest=MarkdownMathBasicTest test -DskipITs`.
 - Added a lightweight in-test stub for the `plain/1.0` stream parser so the regression suite can inspect paragraph content and guard against text duplication (runtime still relies on the real plain components).
 - Refined `ParagraphNodeVisitor.emitEmbeddedBlockMath` to dispatch plain segments through flexmark `Text` nodes, preventing duplicated paragraphs around display math while keeping inline math detection active.
+  * Root cause: we previously fed prose back through `parseInline`, which replayed the same buffer twice and starved the inline visitor; that duplicated paragraph content and left `$...$` spans untreated. Now we wrap the plain slice in a flexmark `Text` node so the regular visitor path sees it exactly once and converts inline math as expected.
 - Test fixtures under `src/test/resources/markdown12/specific` now target `markdown-math/1.0` and include the sample math page.
 - `mvn -pl syntax-markdown-commonmark12 -am test -DskipITs` still fails: `markdown12/specific/math.test` and the subscript/superscript fixtures disagree on escaped dollars and `~`/`^` handling, and the configuration tests still lack realistic plain renderer/stream parser bindings.
 

@@ -152,7 +152,8 @@ This document captures the end-to-end work done to add LaTeX math to XWiki's Mar
 - Pages render again (no 404; no MissingParserException for `markdown/1.2`).
 - New syntax `markdown-math/1.0` available and functioning.
 - Autolink NoClassDefFoundError resolved (autolink shaded).
-- Deployable JAR prepared at `deploy/syntax-markdown-math10-16.5.0-math1.0.jar`.
+- Deployable JAR prepared at `deploy/syntax-markdown-math10-16.5.0-math1.0.jar`.
+- Targeted math suite (`MarkdownMathBasicTest`) passing as of 2025-09-21 10:23 CEST; refreshed jar staged at the same path.
 
 ## Notes & Limits
 

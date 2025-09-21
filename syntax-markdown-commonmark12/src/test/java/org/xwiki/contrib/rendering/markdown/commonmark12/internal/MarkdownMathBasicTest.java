@@ -8,6 +8,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -30,6 +31,7 @@ import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -87,13 +89,13 @@ public class MarkdownMathBasicTest
         registerMinimalMocks();
 
         Parser parser = this.mocker.getInstance(Parser.class, "markdown-math/1.0");
-        String expression = "\\varsigma^\\text{proto}_k = \\operatorname{spin}\\left(\\{q_{u} - q_{u-1}\\}_{u=k-h}^{k}\\right)";
+        String expression = "\\xi^\\text{sprong}_r = \\operatorname{whurl}\\left(\\{n_{u} - n_{u-1}\\}_{u=r-h}^{r}\\right)";
         String sample = String.join("\n",
-                "For each signal start index $s$, compute a proto-voltage using the prior window of neutral steps:",
+                "Each shiver start index $r$ leans on a pre-jitter spool gathered before gulping $y_r$ (no hindsight).",
                 "$$",
                 expression,
                 "$$",
-                "This uses a right-aligned slice ending at $k$.");
+                "That routine samples the cache at the exact same tick.");
 
         XDOM xdom = parser.parse(new StringReader(sample));
 
@@ -107,6 +109,30 @@ public class MarkdownMathBasicTest
 
         assertEquals("Expected a block math macro for the $$ expression", 1, blockMacros.size());
         assertEquals(blockMath(expression), blockMacros.get(0).getContent());
+    }
+
+    @Test
+    public void inlineMathWithUnderscoresSurvivesEmphasis() throws Exception
+    {
+        registerMinimalMocks();
+
+        Parser parser = this.mocker.getInstance(Parser.class, "markdown-math/1.0");
+        String expression = "\\upsilon^\\text{glint}_j = \\theta_{r(j)}";
+        String sample = String.join(" ",
+                "Nebulae at pass $j$ cling to a wobble gauge, so the stitched readout",
+                "$" + expression + "$",
+                "stays glued in place.");
+
+        XDOM xdom = parser.parse(new StringReader(sample));
+
+        List<MacroBlock> inlineMacros = findMathMacros(xdom).stream()
+            .filter(MacroBlock::isInline)
+            .collect(Collectors.toList());
+
+        boolean found = inlineMacros.stream()
+            .map(MacroBlock::getContent)
+            .anyMatch(inlineMath(expression)::equals);
+        assertTrue("Inline math placeholder lost expected content", found);
     }
 
     @Test

@@ -52,16 +52,27 @@ public abstract class AbstractMarkdownStreamParser implements StreamParser
     @Override
     public void parse(Reader source, Listener listener) throws ParseException
     {
-        Node document;
         MutableDataHolder options = getConfiguration().getOptions();
         Parser parser = Parser.builder(options).build();
+        String rawContent;
         try {
-            document = parser.parse(IOUtils.toString(source));
+            rawContent = IOUtils.toString(source);
         } catch (Exception e) {
-            throw new ParseException("Failed to parse Markdown content", e);
+            throw new ParseException("Failed to read Markdown content", e);
         }
 
-        this.visitorProvider.get().visit(document, listener, getSyntax());
+        MathContentPlaceholderProcessor.Result preprocessed =
+            MathContentPlaceholderProcessor.preprocess(rawContent);
+        MathContentPlaceholderProcessor.pushTokens(preprocessed.getTokens());
+
+        try {
+            Node document = parser.parse(preprocessed.getContent());
+            this.visitorProvider.get().visit(document, listener, getSyntax());
+        } catch (Exception e) {
+            throw new ParseException("Failed to parse Markdown content", e);
+        } finally {
+            MathContentPlaceholderProcessor.clear();
+        }
     }
 
     protected MarkdownConfiguration getConfiguration()
@@ -69,3 +80,4 @@ public abstract class AbstractMarkdownStreamParser implements StreamParser
         return this.configuration;
     }
 }
+

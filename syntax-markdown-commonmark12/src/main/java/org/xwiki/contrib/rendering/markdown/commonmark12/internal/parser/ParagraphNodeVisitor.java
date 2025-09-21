@@ -81,6 +81,10 @@ public class ParagraphNodeVisitor extends AbstractNodeVisitor
 
     private boolean emitBlockMath(Paragraph node)
     {
+        if (emitBlockMathFromPlaceholders(node)) {
+            return true;
+        }
+
         String raw = node.getChars().toString();
         String trimmed = raw.trim();
 
@@ -135,6 +139,86 @@ public class ParagraphNodeVisitor extends AbstractNodeVisitor
         }
 
         return emitEmbeddedBlockMath(node);
+    }
+
+    private boolean emitBlockMathFromPlaceholders(Paragraph node)
+    {
+        if (!MathContentPlaceholderProcessor.hasTokens()) {
+            return false;
+        }
+
+        List<Object> segments = new ArrayList<>();
+        StringBuilder plainAccumulator = new StringBuilder();
+        boolean foundBlock = false;
+
+        for (Node child = node.getFirstChild(); child != null; child = child.getNext()) {
+            if (child instanceof Text) {
+                String value = child.getChars().toString();
+                int cursor = 0;
+                while (cursor < value.length()) {
+                    MathContentPlaceholderProcessor.PlaceholderMatch match =
+                        MathContentPlaceholderProcessor.findNextPlaceholder(value, cursor);
+                    if (match == null) {
+                        plainAccumulator.append(value.substring(cursor));
+                        break;
+                    }
+
+                    if (match.getStart() > cursor) {
+                        plainAccumulator.append(value, cursor, match.getStart());
+                    }
+
+                    MathContentPlaceholderProcessor.MathToken token =
+                        MathContentPlaceholderProcessor.peek(match.getPlaceholder());
+
+                    if (token != null && !token.isInline()) {
+                        MathContentPlaceholderProcessor.consume(match.getPlaceholder());
+                        String stripped = stripEnclosingLineBreaks(token.getContent());
+                        if (!stripped.trim().isEmpty()) {
+                            addPlainSegment(segments, plainAccumulator);
+                            segments.add(new BlockMathSegment(stripped));
+                            foundBlock = true;
+                        }
+                    } else {
+                        plainAccumulator.append(value, match.getStart(), match.getEnd());
+                    }
+
+                    cursor = match.getEnd();
+                }
+            } else if (child instanceof SoftLineBreak) {
+                plainAccumulator.append(' ');
+            } else if (child instanceof HardLineBreak) {
+                plainAccumulator.append("\n");
+            } else {
+                addPlainSegment(segments, plainAccumulator);
+                segments.add(child);
+            }
+        }
+
+        addPlainSegment(segments, plainAccumulator);
+
+        if (!foundBlock) {
+            return false;
+        }
+
+        boolean paragraphOpen = false;
+        for (Object segment : segments) {
+            if (segment instanceof String) {
+                String textSegment = (String) segment;
+                if (!textSegment.isEmpty()) {
+                    paragraphOpen = ensureParagraph(paragraphOpen);
+                    visitTextSegment(textSegment);
+                }
+            } else if (segment instanceof BlockMathSegment) {
+                paragraphOpen = closeParagraph(paragraphOpen);
+                emitBlockMacro(((BlockMathSegment) segment).getContent());
+            } else if (segment instanceof Node) {
+                paragraphOpen = ensureParagraph(paragraphOpen);
+                getVisitor().visit((Node) segment);
+            }
+        }
+
+        closeParagraph(paragraphOpen);
+        return true;
     }
 
     private String stripEnclosingLineBreaks(String value)
@@ -253,7 +337,7 @@ public class ParagraphNodeVisitor extends AbstractNodeVisitor
                 if (mathAccumulator != null) {
                     mathAccumulator.append('\n');
                 } else {
-                    plainAccumulator.append("\n");
+                    plainAccumulator.append("\\n");
                 }
             } else {
                 if (mathAccumulator != null) {
@@ -348,3 +432,4 @@ public class ParagraphNodeVisitor extends AbstractNodeVisitor
         return false;
     }
 }
+

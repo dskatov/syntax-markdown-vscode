@@ -63,6 +63,36 @@ public class TextNodeVisitor extends AbstractNodeVisitor
     {
         int index = 0;
         while (index < value.length()) {
+            MathContentPlaceholderProcessor.PlaceholderMatch match =
+                MathContentPlaceholderProcessor.findNextPlaceholder(value, index);
+
+            if (match == null) {
+                processLegacy(value.substring(index));
+                break;
+            }
+
+            if (match.getStart() > index) {
+                processLegacy(value.substring(index, match.getStart()));
+            }
+
+            MathContentPlaceholderProcessor.MathToken token =
+                MathContentPlaceholderProcessor.peek(match.getPlaceholder());
+
+            if (token != null && token.isInline()) {
+                MathContentPlaceholderProcessor.consume(match.getPlaceholder());
+                emitInlineMath(token.getContent());
+            } else {
+                processLegacy(value.substring(match.getStart(), match.getEnd()));
+            }
+
+            index = match.getEnd();
+        }
+    }
+
+    private void processLegacy(String value)
+    {
+        int index = 0;
+        while (index < value.length()) {
             int open = value.indexOf('$', index);
             if (open == -1) {
                 emitPlain(value.substring(index));
